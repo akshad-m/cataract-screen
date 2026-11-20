@@ -1,0 +1,7 @@
+{
+ "input_size": 224,
+ "crop_half_width_iris": 2.2,
+ "screen_threshold": 0.5244937571590768,
+ "severity_threshold": 0.5,
+ "source": "models/xdomain/cataract_classifier.tflite + models/cv_phone/heads.npz"
+}

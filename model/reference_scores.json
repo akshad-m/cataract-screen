@@ -1,0 +1,362 @@
+[
+ {
+  "file": "data/combined/mixed/test/cataract/mendeley_cataract_132_0.png",
+  "cataract_score": 0.9806143356289878,
+  "mature_score": 0.6732889876177254,
+  "output": "urgent"
+ },
+ {
+  "file": "data/combined/mixed/test/cataract/mendeley_cataract_189_0.png",
+  "cataract_score": 0.8794138248543681,
+  "mature_score": 0.5531503262965943,
+  "output": "urgent"
+ },
+ {
+  "file": "data/combined/mixed/test/cataract/mendeley_cataract_196_0.png",
+  "cataract_score": 0.9993838073286321,
+  "mature_score": 0.6579346885520213,
+  "output": "urgent"
+ },
+ {
+  "file": "data/combined/mixed/test/cataract/mendeley_cataract_313_0.png",
+  "cataract_score": 0.9308749365296624,
+  "mature_score": 0.16134090445879426,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/test/cataract/mendeley_cataract_398_0.png",
+  "cataract_score": 0.9937824297773975,
+  "mature_score": 0.5338566490319053,
+  "output": "urgent"
+ },
+ {
+  "file": "data/combined/mixed/test/cataract/mendeley_cataract_730_0.png",
+  "cataract_score": 0.9980716096656563,
+  "mature_score": 0.3928088014232054,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/test/cataract/nandan_test_cataract_image_301_0.png",
+  "cataract_score": 0.986013761753852,
+  "mature_score": 0.4129029956996909,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/test/cataract/nandan_train_cataract_image_88_0.png",
+  "cataract_score": 0.8699719103642709,
+  "mature_score": 0.28047404070031373,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/test/normal/mendeley_normal_238_0.png",
+  "cataract_score": 0.05041228763444382,
+  "mature_score": 0.23840101606714653,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/test/normal/mendeley_normal_304_0.png",
+  "cataract_score": 0.008610345570728057,
+  "mature_score": 0.022420326247924033,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/test/normal/mendeley_normal_411_0.png",
+  "cataract_score": 0.022072692929355583,
+  "mature_score": 0.2356066111688213,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/test/normal/nandan_train_normal_image_153_0.png",
+  "cataract_score": 0.4628451047578662,
+  "mature_score": 0.3988774982147825,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/cataract/mendeley_cataract_153_0.png",
+  "cataract_score": 0.9934419828823088,
+  "mature_score": 0.584267162660243,
+  "output": "urgent"
+ },
+ {
+  "file": "data/combined/mixed/train/cataract/mendeley_cataract_160_0.png",
+  "cataract_score": 0.9968985639045052,
+  "mature_score": 0.4340960801394685,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/train/cataract/mendeley_cataract_411_0.png",
+  "cataract_score": 0.8937931283827804,
+  "mature_score": 0.15417566916736883,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/train/cataract/mendeley_cataract_428_0.png",
+  "cataract_score": 0.9833815572296128,
+  "mature_score": 0.3543707322735497,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/train/cataract/mendeley_cataract_705_0.png",
+  "cataract_score": 0.9752135962009127,
+  "mature_score": 0.20141909435095004,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/train/cataract/nandan_train_cataract_image_147_0.png",
+  "cataract_score": 0.7840940606629387,
+  "mature_score": 0.3268219081715387,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/train/cataract/nandan_train_cataract_image_155_0.png",
+  "cataract_score": 0.9807626870011842,
+  "mature_score": 0.8864884686786,
+  "output": "urgent"
+ },
+ {
+  "file": "data/combined/mixed/train/cataract/sardjito_0144_0.png",
+  "cataract_score": 0.9750673046247068,
+  "mature_score": 0.25966036550625926,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/train/cataract/sardjito_0150_0.png",
+  "cataract_score": 0.6167833396133184,
+  "mature_score": 0.010511603036050577,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/train/cataract/sardjito_0164_0.png",
+  "cataract_score": 0.9942762669953821,
+  "mature_score": 0.0848272245898818,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/train/cataract/sardjito_0238_0.png",
+  "cataract_score": 0.5842185981542192,
+  "mature_score": 0.11843260460774568,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/train/cataract/sardjito_0302_0.png",
+  "cataract_score": 0.9837231607630598,
+  "mature_score": 0.8606160201165501,
+  "output": "urgent"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_191_0.png",
+  "cataract_score": 0.028031300940784463,
+  "mature_score": 0.13483070131418295,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_225_0.png",
+  "cataract_score": 0.00471890942899659,
+  "mature_score": 0.00938808036521117,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_263_0.png",
+  "cataract_score": 0.015514919247848981,
+  "mature_score": 0.01587368532578916,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_274_0.png",
+  "cataract_score": 0.0013496858227241802,
+  "mature_score": 0.18967414667716062,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_338_0.png",
+  "cataract_score": 0.002094011429106776,
+  "mature_score": 0.0013234381996335852,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_358_0.png",
+  "cataract_score": 0.000894208427388789,
+  "mature_score": 0.040547316165181986,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_36_0.png",
+  "cataract_score": 0.008623395170625573,
+  "mature_score": 0.009336077884151492,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_395_0.png",
+  "cataract_score": 0.0012230031764624795,
+  "mature_score": 0.013839112174389292,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_400_0.png",
+  "cataract_score": 0.021559456785149336,
+  "mature_score": 0.13800428242377402,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_508_0.png",
+  "cataract_score": 0.0133343781423855,
+  "mature_score": 0.032825996189158414,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_558_0.png",
+  "cataract_score": 0.0031660603445751584,
+  "mature_score": 0.056600968843690744,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_566_0.png",
+  "cataract_score": 0.006442947777469332,
+  "mature_score": 0.14295911054356295,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_568_0.png",
+  "cataract_score": 0.01841471438611379,
+  "mature_score": 0.30357920277823874,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_597_0.png",
+  "cataract_score": 0.0016050117300519993,
+  "mature_score": 0.08248590461535835,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_62_0.png",
+  "cataract_score": 0.02987246990322882,
+  "mature_score": 0.08728032808057296,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_647_0.png",
+  "cataract_score": 0.002340261812436073,
+  "mature_score": 0.028028825632661958,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_656_0.png",
+  "cataract_score": 0.001813215816808615,
+  "mature_score": 0.01186093214237876,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_676_0.png",
+  "cataract_score": 0.007184562858779655,
+  "mature_score": 0.17434088039753556,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/mendeley_normal_93_0.png",
+  "cataract_score": 0.04695146270705421,
+  "mature_score": 0.008854115223696661,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/nandan_train_normal_image_113_0.png",
+  "cataract_score": 0.27749813917482824,
+  "mature_score": 0.6287821008649025,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/nandan_train_normal_image_133_0.png",
+  "cataract_score": 0.17009700113894083,
+  "mature_score": 0.21941484522471955,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/nandan_train_normal_image_226_0.png",
+  "cataract_score": 0.02983767474810482,
+  "mature_score": 0.10657804302458222,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/nandan_train_normal_image_242_0.png",
+  "cataract_score": 0.1572124810785703,
+  "mature_score": 0.4249968315553974,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/nandan_train_normal_image_93_0.png",
+  "cataract_score": 0.002889191448811552,
+  "mature_score": 0.08841190896480375,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/sardjito_0030_0.png",
+  "cataract_score": 0.12155929531726983,
+  "mature_score": 0.04702119493508819,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/sardjito_0061_0.png",
+  "cataract_score": 0.13872962790169813,
+  "mature_score": 0.1576267167670231,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/sardjito_0191_0.png",
+  "cataract_score": 0.04552798595942095,
+  "mature_score": 0.19308149824737447,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/sardjito_0241_0.png",
+  "cataract_score": 0.06823930955600971,
+  "mature_score": 0.08875478070224682,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/train/normal/sardjito_0319_0.png",
+  "cataract_score": 0.16345348854757574,
+  "mature_score": 0.057098191525257205,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/val/cataract/mendeley_cataract_110_0.png",
+  "cataract_score": 0.6572382959437502,
+  "mature_score": 0.050418759874420314,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/val/cataract/nandan_train_cataract_image_31_0.png",
+  "cataract_score": 0.960327862099195,
+  "mature_score": 0.478824163361395,
+  "output": "refer"
+ },
+ {
+  "file": "data/combined/mixed/val/normal/mendeley_normal_188_0.png",
+  "cataract_score": 0.010845748903436566,
+  "mature_score": 0.014826214253958301,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/val/normal/mendeley_normal_513_0.png",
+  "cataract_score": 0.016639210457325256,
+  "mature_score": 0.015758831428779197,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/val/normal/mendeley_normal_599_0.png",
+  "cataract_score": 0.042048403979160716,
+  "mature_score": 0.040441648534530174,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/val/normal/nandan_train_normal_image_29_0.png",
+  "cataract_score": 0.13265365807162113,
+  "mature_score": 0.04126534010250282,
+  "output": "normal"
+ },
+ {
+  "file": "data/combined/mixed/val/normal/sardjito_0205_0.png",
+  "cataract_score": 0.07015414606131402,
+  "mature_score": 0.15429827595417683,
+  "output": "normal"
+ }
+]

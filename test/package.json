@@ -1,0 +1,13 @@
+{
+  "name": "cataract-web-tests",
+  "private": true,
+  "type": "module",
+  "description": "Parity tests: web/vision.js and the ONNX model against the Python demo",
+  "scripts": {
+    "test": "node test_vision.mjs"
+  },
+  "devDependencies": {
+    "onnxruntime-node": "1.20.1",
+    "pngjs": "7.0.0"
+  }
+}

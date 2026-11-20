@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Cataract Screen</title>
+  <meta name="description" content="Student project prototype: phone-camera eye capture with glare separation and a cataract screening model. Not a medical device.">
+  <meta name="theme-color" content="#0b63ce">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Cataract Screen">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Cataract Screen</h1>
+    <p>Final-year project prototype</p>
+  </header>
+
+  <!-- 1. Intro -->
+  <section id="intro">
+    <div class="card notice">
+      <strong>Prototype, not a diagnosis</strong>
+      This app was built for a student project. It has not been clinically validated and can be wrong
+      in both directions. Anyone with eye problems should see an eye doctor.
+    </div>
+    <div class="card">
+      <strong>How to scan</strong>
+      <div class="segmented" role="radiogroup" aria-label="Scan mode">
+        <label><input type="radio" name="mode" value="closeup" checked> One eye, close-up (recommended)</label>
+        <label><input type="radio" name="mode" value="face"> Whole face, both eyes</label>
+      </div>
+      <ol class="steps" id="steps-closeup">
+        <li>Use steady room light. Avoid strong lamps or the flash.</li>
+        <li>Hold the phone about 10–15 cm from one eye, so the eye fills the middle of the picture.</li>
+        <li>Put the coloured part of the eye (the iris) inside the ring. Wait until the ring turns green.</li>
+        <li>Tap <b>Capture</b> and hold still for a second. Then scan the other eye.</li>
+      </ol>
+      <ol class="steps" id="steps-face" hidden>
+        <li>Use steady room light. Avoid strong lamps or the flash.</li>
+        <li>Hold the phone 15–25 cm from the face, with the whole face in view.</li>
+        <li>When both eye boxes turn green, tap <b>Capture</b> and hold still for a second.</li>
+      </ol>
+      <div class="segmented" role="radiogroup" aria-label="Camera">
+        <label><input type="radio" name="facing" value="environment" checked> Back camera (sharper)</label>
+        <label><input type="radio" name="facing" value="user"> Front camera (selfie)</label>
+      </div>
+      <button id="start" class="primary" disabled><span class="spinner"></span> Loading models…</button>
+      <p class="status" id="load-status">Downloading the eye-finding and screening models (about 15 MB, first time only).</p>
+    </div>
+    <div class="card">
+      <strong>No camera?</strong>
+      <p class="meta" style="margin:4px 0 10px">Analyse a photo of a whole face instead (both eyes visible, looking at the camera). A single photo skips glare separation.</p>
+      <label class="button secondary" for="photo-input" id="photo-label" style="width:100%">Choose a photo</label>
+      <input type="file" id="photo-input" accept="image/*" hidden>
+    </div>
+  </section>
+
+  <!-- 2. Camera -->
+  <section id="camera" hidden>
+    <div class="viewer" id="viewer">
+      <video id="video" playsinline muted autoplay></video>
+      <canvas id="overlay"></canvas>
+    </div>
+    <div class="segmented" role="radiogroup" aria-label="Which eye" id="closeup-controls">
+      <label><input type="radio" name="which-eye" value="L" checked> Scanning the left eye</label>
+      <label><input type="radio" name="which-eye" value="R"> Scanning the right eye</label>
+    </div>
+    <div class="eyestate">
+      <div><b id="eyestate-L-title">Left eye</b><span id="state-L">starting…</span></div>
+      <div id="eyestate-R"><b>Right eye</b><span id="state-R">starting…</span></div>
+    </div>
+    <div class="progress" id="progress" hidden><span></span></div>
+    <div class="row">
+      <button id="back" class="secondary">Back</button>
+      <button id="capture" class="primary" disabled>Capture</button>
+    </div>
+    <p class="status" id="camera-status"></p>
+  </section>
+
+  <!-- 3. Results -->
+  <section id="results" hidden>
+    <div id="result-cards"></div>
+    <div class="row">
+      <button id="again" class="primary">Scan again</button>
+    </div>
+    <p class="meta" style="margin-top:14px">
+      NORMAL: no cataract-like signs found. REFER: cataract-like (immature-like) appearance.
+      URGENT: looks like an advanced (mature) cataract. These labels are this prototype's simplification,
+      not medical advice.
+    </p>
+  </section>
+
+  <footer>
+    Runs entirely on this device: photos are not uploaded or stored.<br>
+    Model: AUC 0.90 on cross-validated phone photos from one hospital dataset. Not a medical device.
+  </footer>
+</main>
+</body>
+</html>
