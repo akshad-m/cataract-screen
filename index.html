@@ -10,8 +10,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Cataract Screen">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icon.svg?v=5" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon-180.png?v=5">
+  <link rel="icon" href="icon.svg?v=6" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-180.png?v=6">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -19,13 +19,55 @@
     // apply the saved theme before first paint (no flash)
     try { const t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
-  <script type="module" src="app.js?v=5"></script>
+  <script type="module" src="app.js?v=6"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="logo" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#0e6b5c"/><path d="M8 32c6-10 14-15 24-15s18 5 24 15c-6 10-14 15-24 15S14 42 8 32z" fill="#f6f4ef"/><circle cx="32" cy="32" r="11" fill="#0e6b5c"/><circle cx="32" cy="32" r="6" fill="#13231f"/><path d="M32 26a6 6 0 0 1 0 12z" fill="#b9d6cc"/><path d="M52 9v8M48 13h8" stroke="#f6f4ef" stroke-width="2.8" stroke-linecap="round"/></symbol>
+  <!-- instruction illustrations (96 x 96); colours follow the theme, motion in style.css -->
+  <symbol id="ill-light" viewBox="0 0 96 96">
+    <g class="rays" stroke="var(--refer)" stroke-width="4" stroke-linecap="round">
+      <path d="M36 12v8M36 52v8M12 36h8M52 36h8M19 19l6 6M47 47l6 6M19 53l6-6M47 25l6-6"/>
+    </g>
+    <circle cx="36" cy="36" r="11" fill="var(--refer)"/>
+    <g transform="translate(58 58)">
+      <rect width="30" height="30" rx="8" fill="var(--surface)" stroke="var(--line)" stroke-width="2"/>
+      <path d="M17 6l-7 11h6l-3 8 8-12h-6z" fill="var(--muted)"/>
+      <path d="M5 25L25 5" stroke="var(--urgent)" stroke-width="3" stroke-linecap="round"/>
+    </g>
+  </symbol>
+  <symbol id="ill-distance" viewBox="0 0 96 96">
+    <path d="M6 48c5-8 10-12 16-12s11 4 16 12c-5 8-10 12-16 12S11 56 6 48z" fill="var(--surface)" stroke="var(--ink)" stroke-width="2.5"/>
+    <circle cx="22" cy="48" r="6" fill="var(--accent)"/>
+    <g class="approach">
+      <rect x="66" y="22" width="22" height="52" rx="5" fill="var(--surface)" stroke="var(--ink)" stroke-width="2.5"/>
+      <circle cx="77" cy="30" r="2.4" fill="var(--ink)"/>
+    </g>
+    <path d="M44 48h16M44 48l4-4M44 48l4 4M60 48l-4-4M60 48l-4 4" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <text x="52" y="76" text-anchor="middle" font-size="11" font-weight="600" fill="var(--muted)" font-family="IBM Plex Sans, sans-serif">10–15 cm</text>
+  </symbol>
+  <symbol id="ill-ring" viewBox="0 0 96 96">
+    <clipPath id="ill-screen"><rect x="18" y="6" width="60" height="84" rx="8"/></clipPath>
+    <rect x="18" y="6" width="60" height="84" rx="8" fill="#000"/>
+    <g clip-path="url(#ill-screen)"><g class="slide"><image href="ill/eye.jpg" x="8" y="18" width="80" height="80" preserveAspectRatio="xMidYMid slice"/></g></g>
+    <circle class="ring" cx="48" cy="58" r="11" fill="none" stroke-width="3"/>
+    <rect x="18" y="6" width="60" height="84" rx="8" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+  </symbol>
+  <symbol id="ill-hold" viewBox="0 0 96 96">
+    <circle cx="48" cy="48" r="26" fill="none" stroke="var(--line)" stroke-width="6"/>
+    <circle class="countdown" cx="48" cy="48" r="26" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round"
+            pathLength="100" stroke-dasharray="100" transform="rotate(-90 48 48)"/>
+    <path class="tick" d="M37 49l8 8 15-17" fill="none" stroke="var(--ok)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="ill-face" viewBox="0 0 96 96">
+    <rect x="18" y="6" width="60" height="84" rx="8" fill="var(--surface)" stroke="var(--ink)" stroke-width="2.5"/>
+    <ellipse cx="48" cy="46" rx="17" ry="22" fill="none" stroke="var(--muted)" stroke-width="2.5"/>
+    <rect class="eyebox" x="34" y="36" width="11" height="9" rx="1.5" fill="none" stroke-width="2"/>
+    <rect class="eyebox" x="51" y="36" width="11" height="9" rx="1.5" fill="none" stroke-width="2"/>
+    <path d="M42 58c4 3 8 3 12 0" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round"/>
+  </symbol>
   <symbol id="eye" viewBox="0 0 48 48"><path d="M4 24c5-9 12-14 20-14s15 5 20 14c-5 9-12 14-20 14S9 33 4 24z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><circle cx="24" cy="24" r="7" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="24" cy="24" r="2.5" fill="currentColor"/></symbol>
 </svg>
 <main>
@@ -54,16 +96,30 @@
     </fieldset>
 
     <ol class="steps" id="steps-closeup">
-      <li><span>Use steady room light. Avoid strong lamps and the flash.</span></li>
-      <li><span>Hold the phone 10–15 cm from one eye, so the eye fills the middle of the picture.</span></li>
-      <li><span>Put the coloured part of the eye (the iris) inside the ring. Wait for the ring to turn green.</span></li>
-      <li><span>Tap <b>Capture</b> and hold still for a second. Then scan the other eye.</span></li>
+      <li><span class="ill" aria-hidden="true"><svg viewBox="0 0 96 96"><use href="#ill-light"/></svg></span>
+        <span class="txt"><b>Good light, no flash.</b> Steady room light from the front. Avoid strong lamps and the camera flash.</span></li>
+      <li><span class="ill" aria-hidden="true"><svg viewBox="0 0 96 96"><use href="#ill-distance"/></svg></span>
+        <span class="txt"><b>Hold the phone 10–15 cm away</b> from one eye, so the eye fills the middle of the picture.</span></li>
+      <li><span class="ill" aria-hidden="true"><svg viewBox="0 0 96 96"><use href="#ill-ring"/></svg></span>
+        <span class="txt"><b>Put the iris in the ring.</b> The coloured part of the eye goes inside the ring, which turns green when the picture is good.</span></li>
+      <li><span class="ill" aria-hidden="true"><svg viewBox="0 0 96 96"><use href="#ill-hold"/></svg></span>
+        <span class="txt"><b>Hold still for a second.</b> With auto-capture on it captures by itself, or tap <b>Capture</b>. Then scan the other eye.</span></li>
     </ol>
     <ol class="steps" id="steps-face" hidden>
-      <li><span>Use steady room light. Avoid strong lamps and the flash.</span></li>
-      <li><span>Hold the phone 15–25 cm from the face, with the whole face in view.</span></li>
-      <li><span>When both eye boxes turn green, tap <b>Capture</b> and hold still for a second.</span></li>
+      <li><span class="ill" aria-hidden="true"><svg viewBox="0 0 96 96"><use href="#ill-light"/></svg></span>
+        <span class="txt"><b>Good light, no flash.</b> Steady room light from the front. Avoid strong lamps and the camera flash.</span></li>
+      <li><span class="ill" aria-hidden="true"><svg viewBox="0 0 96 96"><use href="#ill-face"/></svg></span>
+        <span class="txt"><b>Whole face in view,</b> with the phone 15–25 cm away and the person looking at the camera.</span></li>
+      <li><span class="ill" aria-hidden="true"><svg viewBox="0 0 96 96"><use href="#ill-hold"/></svg></span>
+        <span class="txt"><b>Hold still</b> when both eye boxes turn green. It captures by itself, or tap <b>Capture</b>.</span></li>
     </ol>
+
+    <div class="examples" aria-label="Example photos">
+      <figure class="good"><img src="ill/good.jpg" alt="A sharp, evenly lit eye"><figcaption>Sharp, even light</figcaption></figure>
+      <figure><img src="ill/blurry.jpg" alt="A blurry eye"><figcaption>Blurry</figcaption></figure>
+      <figure><img src="ill/dark.jpg" alt="A very dark eye"><figcaption>Too dark</figcaption></figure>
+      <figure><img src="ill/flash.jpg" alt="An eye with bright flash reflections"><figcaption>Flash glare</figcaption></figure>
+    </div>
 
     <div class="segmented" role="radiogroup" aria-label="Camera">
       <label><input type="radio" name="facing" value="environment" checked> Back camera</label>
@@ -124,7 +180,8 @@
 
   <footer>
     Runs entirely on this device: photos are not uploaded or stored.<br>
-    Model: AUC 0.90 on cross-validated phone photos from one hospital dataset. Not a medical device.
+    Model: AUC 0.90 on cross-validated phone photos from one hospital dataset. Not a medical device.<br>
+    Example eye photo: Cataract-Sardjito dataset (Roboflow Universe), CC BY 4.0.
   </footer>
 </main>
 </body>
