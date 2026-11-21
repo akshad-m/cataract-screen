@@ -9,7 +9,7 @@
 //                       (as in the laptop demo).
 
 import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs";
-import * as V from "./vision.js?v=2";   // bump ?v= (here and in index.html) on every release: Pages caches ~10 min
+import * as V from "./vision.js?v=3";   // bump ?v= (here and in index.html) on every release: Pages caches ~10 min
 
 const MEDIAPIPE_WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/wasm";
 const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
@@ -156,7 +156,6 @@ async function startCamera() {
   const video = $("video");
   video.srcObject = state.stream;
   await video.play();
-  $("viewer").style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
   $("viewer").classList.toggle("mirrored", facing === "user");
   await setRunningMode("VIDEO");
   state.collectors = state.mode === "closeup"

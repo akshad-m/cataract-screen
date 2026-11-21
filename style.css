@@ -117,8 +117,11 @@ button:focus-visible, .button:focus-visible { outline: 2px solid var(--accent); 
 
 /* ---- camera ---- */
 #camera { padding-top: 14px; }
-.viewer { position: relative; border-radius: 16px; overflow: hidden; background: #000; aspect-ratio: 3 / 4; margin-bottom: 12px; }
-.viewer video, .viewer canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* The frame takes the video's own size (no fixed shape, so no black bars), capped in height so the
+   Capture button stays on screen; the overlay canvas covers exactly the video. */
+.viewer { position: relative; width: fit-content; max-width: 100%; margin: 0 auto 12px; border-radius: 16px; overflow: hidden; background: #000; line-height: 0; }
+.viewer video { display: block; width: auto; height: auto; max-width: 100%; max-height: min(62vh, 640px); }
+.viewer canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .viewer.mirrored video, .viewer.mirrored canvas { transform: scaleX(-1); }
 .eyestate { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 10px; }
 .eyestate:has(#eyestate-R[hidden]) { grid-template-columns: 1fr; }
