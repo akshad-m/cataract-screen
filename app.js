@@ -9,7 +9,7 @@
 //                       (as in the laptop demo).
 
 import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs";
-import * as V from "./vision.js?v=4";   // bump ?v= (here and in index.html) on every release: Pages caches ~10 min
+import * as V from "./vision.js?v=5";   // bump ?v= (here and in index.html) on every release: Pages caches ~10 min
 
 const MEDIAPIPE_WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/wasm";
 const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
@@ -541,15 +541,20 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   return y;
 }
 
-function drawEyeLogo(ctx, x, y, size, color) {
-  const s = size / 48;
+/** The app logo (teal tile, eye with a half-clouded pupil, small plus) at x, y, size px. */
+function drawLogo(ctx, x, y, size) {
+  const s = size / 64;
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(s, s);
-  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 3; ctx.lineJoin = "round";
-  ctx.stroke(new Path2D("M4 24c5-9 12-14 20-14s15 5 20 14c-5 9-12 14-20 14S9 33 4 24z"));
-  ctx.beginPath(); ctx.arc(24, 24, 7, 0, 2 * Math.PI); ctx.stroke();
-  ctx.beginPath(); ctx.arc(24, 24, 2.5, 0, 2 * Math.PI); ctx.fill();
+  const fill = (color, path) => { ctx.fillStyle = color; ctx.fill(new Path2D(path)); };
+  fill("#0e6b5c", "M15 0h34a15 15 0 0 1 15 15v34a15 15 0 0 1-15 15H15A15 15 0 0 1 0 49V15A15 15 0 0 1 15 0z");
+  fill("#f6f4ef", "M8 32c6-10 14-15 24-15s18 5 24 15c-6 10-14 15-24 15S14 42 8 32z");
+  fill("#0e6b5c", "M43 32a11 11 0 1 1-22 0a11 11 0 1 1 22 0z");
+  fill("#13231f", "M38 32a6 6 0 1 1-12 0a6 6 0 1 1 12 0z");
+  fill("#b9d6cc", "M32 26a6 6 0 0 1 0 12z");
+  ctx.strokeStyle = "#f6f4ef"; ctx.lineWidth = 2.8; ctx.lineCap = "round";
+  ctx.stroke(new Path2D("M52 9v8M48 13h8"));
   ctx.restore();
 }
 
@@ -563,8 +568,8 @@ async function buildReport(results) {
   ctx.fillStyle = R.bg; ctx.fillRect(0, 0, w, canvas.height);
   ctx.textBaseline = "alphabetic";
 
-  drawEyeLogo(ctx, pad, 70, 52, R.accent);
-  ctx.fillStyle = R.ink; ctx.font = `600 30px ${R.sans}`; ctx.fillText("Cataract Screen", pad + 66, 106);
+  drawLogo(ctx, pad, 62, 60);
+  ctx.fillStyle = R.ink; ctx.font = `600 30px ${R.sans}`; ctx.fillText("Cataract Screen", pad + 78, 103);
   ctx.fillStyle = R.muted; ctx.font = `400 24px ${R.sans}`;
   ctx.fillText(new Date().toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }), pad, 176);
   ctx.fillStyle = R.ink; ctx.font = `500 56px ${R.serif}`; ctx.fillText("Eye screening result", pad, 250);

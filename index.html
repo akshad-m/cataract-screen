@@ -10,8 +10,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Cataract Screen">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="icon" href="icon.svg?v=5" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-180.png?v=5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -19,17 +19,18 @@
     // apply the saved theme before first paint (no flash)
     try { const t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
-  <script type="module" src="app.js?v=4"></script>
+  <script type="module" src="app.js?v=5"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#0e6b5c"/><path d="M8 32c6-10 14-15 24-15s18 5 24 15c-6 10-14 15-24 15S14 42 8 32z" fill="#f6f4ef"/><circle cx="32" cy="32" r="11" fill="#0e6b5c"/><circle cx="32" cy="32" r="6" fill="#13231f"/><path d="M32 26a6 6 0 0 1 0 12z" fill="#b9d6cc"/><path d="M52 9v8M48 13h8" stroke="#f6f4ef" stroke-width="2.8" stroke-linecap="round"/></symbol>
   <symbol id="eye" viewBox="0 0 48 48"><path d="M4 24c5-9 12-14 20-14s15 5 20 14c-5 9-12 14-20 14S9 33 4 24z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><circle cx="24" cy="24" r="7" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="24" cy="24" r="2.5" fill="currentColor"/></symbol>
 </svg>
 <main>
   <header class="topbar">
-    <div class="brand"><svg class="logo"><use href="#eye"/></svg><span>Cataract Screen</span></div>
+    <div class="brand"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg><span>Cataract Screen</span></div>
     <div class="theme" role="group" aria-label="Colour theme">
       <button type="button" data-theme-choice="auto" aria-pressed="true">Auto</button>
       <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
