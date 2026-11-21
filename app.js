@@ -9,7 +9,7 @@
 //                       (as in the laptop demo).
 
 import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs";
-import * as V from "./vision.js";
+import * as V from "./vision.js?v=2";   // bump ?v= (here and in index.html) on every release: Pages caches ~10 min
 
 const MEDIAPIPE_WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/wasm";
 const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
@@ -139,6 +139,7 @@ async function startCamera() {
   state.mode = selected("mode");
   const facing = selected("facing");
   if (!navigator.mediaDevices?.getUserMedia) {
+    show("intro");
     setStatus("load-status", "This browser cannot open the camera here. The page must be opened over https (or localhost).", true);
     return;
   }
@@ -146,6 +147,7 @@ async function startCamera() {
     state.stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false });
   } catch (e) {
+    show("intro");
     setStatus("load-status", e.name === "NotAllowedError"
       ? "Camera access was refused. Allow the camera for this site in the browser settings, then try again."
       : `Could not open the camera (${e.message}).`, true);
@@ -371,39 +373,72 @@ function figure(img, caption) {
   return el("figure", {}, canvas, el("figcaption", {}, caption));
 }
 
+function eyeIcon() {
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  const use = document.createElementNS(ns, "use");
+  use.setAttribute("href", "#eye");
+  svg.append(use);
+  return svg;
+}
+
+/** Score line: green up to the screening cut-off, amber above it, a marker at the score. */
+function meter(score) {
+  const cut = 100 * state.config.screen_threshold;
+  const bar = el("div", { class: "meter" }, el("i", { style: `left:${(100 * Math.min(Math.max(score, 0), 1)).toFixed(1)}%` }));
+  bar.style.background = `linear-gradient(90deg, var(--ok) 0 ${cut}%, var(--refer) ${cut}% 100%)`;
+  return [bar, el("div", { class: "scale" }, el("span", {}, "clear"),
+                  el("span", {}, `cut-off ${state.config.screen_threshold.toFixed(2)}`), el("span", {}, "cloudy"))];
+}
+
 function renderResults(results) {
   const box = $("result-cards");
   box.replaceChildren();
   for (const r of results) {
+    const title = el("div", { class: "result-eye" }, eyeIcon(),
+                     el("span", {}, r.error ? r.name : `${r.name} (person's ${r.name.split(" ")[0].toLowerCase()})`));
     if (r.error) {
-      box.append(el("div", { class: "card result" },
-        el("div", { class: "head" }, el("h2", {}, r.name), el("span", { class: "badge none" }, "NO RESULT")),
-        el("div", { class: "body" }, el("p", {}, r.error))));
+      box.append(el("div", { class: "result" }, title,
+        el("div", { class: "verdict none" }, el("small", {}, "Result"), el("strong", {}, "No result")),
+        el("div", { class: "explain" }, el("p", {}, r.error))));
       continue;
     }
-    const [badge, text] = OUTPUT_TEXT[r.output];
-    const composite = el("canvas", { class: "composite" });
-    drawRGB(composite, r.res.medianColor);
-    const notes = [];
-    notes.push(`Cataract score ${r.cataract.toFixed(2)} (cut-off ${state.config.screen_threshold.toFixed(2)})`);
-    if (r.output !== "normal") notes.push(`severity score ${r.mature.toFixed(2)} (urgent from ${state.config.severity_threshold.toFixed(2)})`);
-    if (r.photo) notes.push("single photo: glare separation skipped");
-    if (r.photo && !r.quality.passed) notes.push(`photo quality: ${r.quality.reason.toLowerCase()}, so treat this result with extra caution`);
+    const [word, text] = OUTPUT_TEXT[r.output];
+    const photo = el("canvas", { class: "eye-photo" });
+    drawRGB(photo, r.res.medianColor);
+    const notes = [`Score ${r.cataract.toFixed(2)}`];
+    if (r.output !== "normal") notes.push(`severity ${r.mature.toFixed(2)} (urgent from ${state.config.severity_threshold.toFixed(2)})`);
+    notes.push(r.photo ? "single photo, glare separation skipped" : `${V.BURST_FRAMES} frames, glare removed`);
+    if (r.photo && !r.quality.passed) notes.push(`photo quality: ${r.quality.reason.toLowerCase()}, so treat with extra caution`);
     const panels = el("div", { class: "panels" },
       figure(r.lastFrame, "last frame"),
       figure(r.res.medianColor, "de-glared"),
-      figure(withMaskInRed(r.res.medianColor, r.res.opacityMask), `opacity ${(100 * r.res.opacityFraction).toFixed(1)}%`),
+      figure(withMaskInRed(r.res.medianColor, r.res.opacityMask), `fixed bright area ${(100 * r.res.opacityFraction).toFixed(1)}%`),
       figure(r.res.glareMask, "moving glare"));
-    box.append(el("div", { class: "card result" },
-      el("div", { class: "head" }, el("h2", {}, `${r.name} (person's ${r.name.split(" ")[0].toLowerCase()})`),
-         el("span", { class: `badge ${r.output}` }, badge)),
-      el("div", { class: "body" },
-        composite,
+    box.append(el("div", { class: "result" }, title, photo,
+      el("div", { class: `verdict ${r.output}` }, el("small", {}, "Result"),
+         el("strong", {}, word[0] + word.slice(1).toLowerCase())),
+      ...meter(r.cataract),
+      el("div", { class: "explain" },
         el("p", {}, text),
         el("p", { class: "meta" }, notes.join(" · ")),
         el("details", {}, el("summary", {}, "Show processing steps"), panels))));
   }
+  $("other-eye").hidden = !(state.mode === "closeup" && results.some((r) => r.burst));
   show("results");
+}
+
+// ---------- theme ----------
+
+function applyTheme(choice) {
+  if (choice === "light" || choice === "dark") document.documentElement.dataset.theme = choice;
+  else delete document.documentElement.dataset.theme;
+  document.querySelectorAll("[data-theme-choice]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.themeChoice === choice)));
+  try { localStorage.setItem("theme", choice); } catch { /* private mode: the choice lasts this visit only */ }
+}
+
+function savedTheme() {
+  try { return localStorage.getItem("theme") || "auto"; } catch { return "auto"; }
 }
 
 // ---------- wiring ----------
@@ -418,7 +453,14 @@ $("start").addEventListener("click", startCamera);
 $("capture").addEventListener("click", startBurst);
 $("back").addEventListener("click", () => { stopCamera(); show("intro"); });
 $("again").addEventListener("click", () => show("intro"));
+$("other-eye").addEventListener("click", () => {
+  const other = selected("which-eye") === "L" ? "R" : "L";
+  document.querySelector(`input[name=which-eye][value=${other}]`).checked = true;
+  startCamera();
+});
 document.querySelectorAll("input[name=mode]").forEach((r) => r.addEventListener("change", showModeSteps));
+document.querySelectorAll("[data-theme-choice]").forEach((b) => b.addEventListener("click", () => applyTheme(b.dataset.themeChoice)));
+applyTheme(savedTheme());
 $("photo-input").addEventListener("change", (e) => {
   const file = e.target.files?.[0];
   e.target.value = "";
