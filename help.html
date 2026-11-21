@@ -8,28 +8,51 @@
   <meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0f1614" media="(prefers-color-scheme: dark)">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icon.svg?v=7" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon-180.png?v=7">
+  <link rel="icon" href="icon.svg?v=8" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-180.png?v=8">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Serif+Devanagari:wght@500&display=swap" rel="stylesheet">
   <script>
     try { const t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
-  <link rel="stylesheet" href="style.css?v=7">
-  <script src="theme.js?v=7" defer></script>
+  <link rel="stylesheet" href="style.css?v=8">
+  <script src="i18n.js?v=8" defer></script>
+  <script src="theme.js?v=8" defer></script>
 </head>
-<body>
+<body data-title-key="help_title">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="lens-pair" viewBox="0 0 320 120">
+        <g transform="translate(10 10)">
+          <path d="M6 50c18-30 40-44 64-44s46 14 64 44c-18 30-40 44-64 44S24 80 6 50z" fill="var(--surface)" stroke="var(--ink)" stroke-width="2.5"/>
+          <circle cx="70" cy="50" r="26" fill="var(--accent)"/>
+          <circle cx="70" cy="50" r="13" fill="#13231f"/>
+          <circle cx="75" cy="45" r="3" fill="#fff"/>
+        </g>
+        <g transform="translate(166 10)">
+          <path d="M6 50c18-30 40-44 64-44s46 14 64 44c-18 30-40 44-64 44S24 80 6 50z" fill="var(--surface)" stroke="var(--ink)" stroke-width="2.5"/>
+          <circle cx="70" cy="50" r="26" fill="var(--accent)"/>
+          <circle cx="70" cy="50" r="13" fill="#c9d3cf"/>
+          <circle cx="66" cy="46" r="6" fill="#e6ece9" opacity=".8"/>
+        </g>
+      </symbol></svg>
 <main class="help">
   <header class="topbar">
-    <a class="brand" href="./"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#0e6b5c"/><path d="M8 32c6-10 14-15 24-15s18 5 24 15c-6 10-14 15-24 15S14 42 8 32z" fill="#f6f4ef"/><circle cx="32" cy="32" r="11" fill="#0e6b5c"/><circle cx="32" cy="32" r="6" fill="#13231f"/><path d="M32 26a6 6 0 0 1 0 12z" fill="#b9d6cc"/><path d="M52 9v8M48 13h8" stroke="#f6f4ef" stroke-width="2.8" stroke-linecap="round"/></svg><span>Cataract Screen</span></a>
-    <div class="theme" role="group" aria-label="Colour theme">
-      <button type="button" data-theme-choice="auto" aria-pressed="true">Auto</button>
-      <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
-      <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
+    <a class="brand" href="./"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#0e6b5c"/><path d="M8 32c6-10 14-15 24-15s18 5 24 15c-6 10-14 15-24 15S14 42 8 32z" fill="#f6f4ef"/><circle cx="32" cy="32" r="11" fill="#0e6b5c"/><circle cx="32" cy="32" r="6" fill="#13231f"/><path d="M32 26a6 6 0 0 1 0 12z" fill="#b9d6cc"/><path d="M52 9v8M48 13h8" stroke="#f6f4ef" stroke-width="2.8" stroke-linecap="round"/></svg><span data-i18n="app_name">Cataract Screen</span></a>
+    <div class="controls">
+      <select class="lang" data-lang-select data-i18n-attr="aria-label:lang_label" aria-label="Language">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+        <option value="mr">मराठी</option>
+      </select>
+      <div class="theme" role="group" data-i18n-attr="aria-label:theme_label" aria-label="Colour theme">
+        <button type="button" data-theme-choice="auto" aria-pressed="true" data-i18n-attr="aria-label:theme_auto;title:theme_auto"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+        <button type="button" data-theme-choice="light" aria-pressed="false" data-i18n-attr="aria-label:theme_light;title:theme_light"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button type="button" data-theme-choice="dark" aria-pressed="false" data-i18n-attr="aria-label:theme_dark;title:theme_dark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="currentColor"/></svg></button>
+      </div>
     </div>
   </header>
 
+  <article data-lang-block="en" lang="en">
   <p class="back"><a href="./">← Back to the scanner</a></p>
   <h1>Cataract: a short guide</h1>
   <p class="lede">What it is, what to do after a screening result, and how it is treated. Written in plain language
@@ -54,23 +77,10 @@
     </ol>
   </nav>
 
-  <section id="what">
+  <section data-section="what">
     <h2>What is a cataract?</h2>
     <figure class="lens-figure" aria-hidden="true">
-      <svg viewBox="0 0 320 120">
-        <g transform="translate(10 10)">
-          <path d="M6 50c18-30 40-44 64-44s46 14 64 44c-18 30-40 44-64 44S24 80 6 50z" fill="var(--surface)" stroke="var(--ink)" stroke-width="2.5"/>
-          <circle cx="70" cy="50" r="26" fill="var(--accent)"/>
-          <circle cx="70" cy="50" r="13" fill="#13231f"/>
-          <circle cx="75" cy="45" r="3" fill="#fff"/>
-        </g>
-        <g transform="translate(166 10)">
-          <path d="M6 50c18-30 40-44 64-44s46 14 64 44c-18 30-40 44-64 44S24 80 6 50z" fill="var(--surface)" stroke="var(--ink)" stroke-width="2.5"/>
-          <circle cx="70" cy="50" r="26" fill="var(--accent)"/>
-          <circle cx="70" cy="50" r="13" fill="#c9d3cf"/>
-          <circle cx="66" cy="46" r="6" fill="#e6ece9" opacity=".8"/>
-        </g>
-      </svg>
+      <svg viewBox="0 0 320 120"><use href="#lens-pair"/></svg>
       <figcaption><span>Clear lens: the pupil looks black</span><span>Cataract: the lens turns cloudy</span></figcaption>
     </figure>
     <p>Behind the coloured part of the eye (the iris) sits a small clear <b>lens</b> that focuses light, like the lens
@@ -82,7 +92,7 @@
       people who need cataract surgery do not have access to it, which is why simple screening matters.</p>
   </section>
 
-  <section id="signs">
+  <section data-section="signs">
     <h2>Signs and symptoms</h2>
     <p>Early on, a cataract often causes <b>no symptoms</b>. As it grows, people notice:</p>
     <ul class="ticks">
@@ -96,7 +106,7 @@
     <p>In an advanced cataract the pupil can look grey or white instead of black. That is what this app's camera looks for.</p>
   </section>
 
-  <section id="risk">
+  <section data-section="risk">
     <h2>Who gets cataract</h2>
     <p>Age is the biggest factor. The chance is also higher with:</p>
     <ul class="ticks">
@@ -111,7 +121,7 @@
       ways to protect the eyes.</p>
   </section>
 
-  <section id="after-result">
+  <section data-section="after-result">
     <h2>After a Refer or Urgent result</h2>
     <p>A screening result is not a diagnosis. The app can be wrong, in both directions. What it does tell you is that a
       proper eye check is worth doing.</p>
@@ -129,7 +139,7 @@
       of many causes of poor vision.</p>
   </section>
 
-  <section id="emergency" class="urgent-box">
+  <section data-section="emergency" class="urgent-box">
     <h2>When to get help straight away</h2>
     <p>A cataract develops slowly and is not an emergency. Go to an eye hospital or emergency department <b>the same day</b> if you have:</p>
     <ul class="ticks">
@@ -140,7 +150,7 @@
     </ul>
   </section>
 
-  <section id="treatment">
+  <section data-section="treatment">
     <h2>Treatment</h2>
     <p><b>Surgery is the only treatment that removes a cataract.</b> Glasses and eye drops cannot clear the lens.</p>
     <h3>Before surgery is needed</h3>
@@ -155,7 +165,7 @@
     <p>If both eyes have cataract, they are usually operated on separately, a few weeks apart.</p>
   </section>
 
-  <section id="after-surgery">
+  <section data-section="after-surgery">
     <h2>After surgery</h2>
     <ul class="ticks">
       <li>Use the eye drops exactly as prescribed, often for about four weeks.</li>
@@ -172,7 +182,7 @@
       opacification</b>. A quick, painless laser treatment (YAG laser) clears it, and it is usually needed only once.</p>
   </section>
 
-  <section id="children">
+  <section data-section="children">
     <h2>Cataract in children</h2>
     <p>Babies and children can also have cataract, from birth or later. Signs include a <b>white or grey pupil</b>
       (sometimes seen as a white glow in flash photos), wandering eyes, or a child not following faces and toys.</p>
@@ -180,7 +190,7 @@
       treated early can cause permanent poor vision (a "lazy eye"). This app is not designed for children's eyes.</p>
   </section>
 
-  <section id="myths">
+  <section data-section="myths">
     <h2>Myths and facts</h2>
     <dl class="myths">
       <dt>"Eye drops can dissolve a cataract."</dt>
@@ -196,7 +206,7 @@
     </dl>
   </section>
 
-  <section id="india">
+  <section data-section="india">
     <h2>Free and low-cost care in India</h2>
     <ul class="ticks">
       <li><b>Government programme (NPCBVI):</b> the National Programme for Control of Blindness and Visual Impairment
@@ -211,7 +221,7 @@
       examine you and explain which free or covered option applies.</p>
   </section>
 
-  <section id="sources">
+  <section data-section="sources">
     <h2>Sources</h2>
     <ul class="sources">
       <li><a href="https://www.nei.nih.gov/learn-about-eye-health/eye-conditions-and-diseases/cataracts" rel="noopener">National Eye Institute (USA): Cataracts</a></li>
@@ -229,6 +239,341 @@
   </section>
 
   <p class="back"><a href="./">← Back to the scanner</a></p>
+  </article>
+  <article data-lang-block="hi" lang="hi" hidden>
+  <p class="back"><a href="./">← जाँच पर वापस जाएँ</a></p>
+  <h1>मोतियाबिंद: एक छोटी गाइड</h1>
+  <p class="lede">यह क्या है, जाँच के नतीजे के बाद क्या करें, और इसका इलाज कैसे होता है। नीचे दिए गए स्रोतों के आधार पर आसान भाषा में लिखा गया।</p>
+  <p class="note">यह पेज सामान्य जानकारी है, डॉक्टरी सलाह नहीं। मोतियाबिंद का निदान और इलाज का फ़ैसला सिर्फ़ आँखों का डॉक्टर कर सकता है।</p>
+
+  <nav class="toc" aria-label="विषय सूची">
+    <h2>विषय सूची</h2>
+    <ol>
+      <li><a href="#what">मोतियाबिंद क्या है?</a></li>
+      <li><a href="#signs">लक्षण</a></li>
+      <li><a href="#risk">यह किसे होता है</a></li>
+      <li><a href="#after-result">"जाँच कराएँ" या "जल्दी जाँच कराएँ" नतीजे के बाद</a></li>
+      <li><a href="#emergency">तुरंत मदद कब लें</a></li>
+      <li><a href="#treatment">इलाज</a></li>
+      <li><a href="#after-surgery">ऑपरेशन के बाद</a></li>
+      <li><a href="#children">बच्चों में मोतियाबिंद</a></li>
+      <li><a href="#myths">भ्रम और सच</a></li>
+      <li><a href="#india">भारत में मुफ़्त और कम ख़र्च वाला इलाज</a></li>
+      <li><a href="#sources">स्रोत</a></li>
+    </ol>
+  </nav>
+
+  <section data-section="what">
+    <h2>मोतियाबिंद क्या है?</h2>
+    <figure class="lens-figure" aria-hidden="true">
+      <svg viewBox="0 0 320 120"><use href="#lens-pair"/></svg>
+      <figcaption><span>साफ़ लेंस: पुतली काली दिखती है</span><span>मोतियाबिंद: लेंस धुंधला हो जाता है</span></figcaption>
+    </figure>
+    <p>आँख के रंगीन हिस्से (आइरिस) के पीछे एक छोटा, साफ़ <b>लेंस</b> होता है जो कैमरे के लेंस की तरह रोशनी को फ़ोकस करता है। जब यह लेंस धीरे-धीरे धुंधला होने लगता है, तो उसे <b>मोतियाबिंद</b> कहते हैं। इससे देखना ऐसा लगता है जैसे धुंधले या गंदे शीशे के पार देख रहे हों।</p>
+    <p>ज़्यादातर मोतियाबिंद उम्र के साथ होते हैं और सालों में धीरे-धीरे बढ़ते हैं। यह बहुत आम है और इसका इलाज हो सकता है: एक छोटे ऑपरेशन में धुंधले लेंस की जगह साफ़ कृत्रिम लेंस लगा दिया जाता है।</p>
+    <p>दुनिया भर में अंधेपन का एक बड़ा कारण मोतियाबिंद है। विश्व स्वास्थ्य संगठन (WHO) के अनुसार, जिन लोगों को मोतियाबिंद के ऑपरेशन की ज़रूरत है, उनमें से लगभग आधे लोगों तक यह सुविधा नहीं पहुँचती। इसीलिए आसान जाँच ज़रूरी है।</p>
+  </section>
+
+  <section data-section="signs">
+    <h2>लक्षण</h2>
+    <p>शुरुआत में मोतियाबिंद से अक्सर <b>कोई लक्षण नहीं</b> होते। बढ़ने पर लोगों को ये दिक़्क़तें होती हैं:</p>
+    <ul class="ticks">
+      <li>धुंधला या कम साफ़ दिखना</li>
+      <li>रंग फीके या पीले-से दिखना</li>
+      <li>चकाचौंध: रोशनी बहुत तेज़ लगना या उसके चारों ओर घेरा दिखना</li>
+      <li>रात में देखने में परेशानी, जैसे गाड़ी चलाते समय</li>
+      <li>एक आँख से दो-दो चीज़ें दिखना</li>
+      <li>चश्मे का नंबर बार-बार बदलना</li>
+    </ul>
+    <p>बढ़े हुए मोतियाबिंद में पुतली काली की जगह सलेटी या सफ़ेद दिख सकती है। यह ऐप कैमरे से यही देखने की कोशिश करता है।</p>
+  </section>
+
+  <section data-section="risk">
+    <h2>यह किसे होता है</h2>
+    <p>सबसे बड़ा कारण बढ़ती उम्र है। इन हालात में ख़तरा और बढ़ जाता है:</p>
+    <ul class="ticks">
+      <li>डायबिटीज़ (शुगर)</li>
+      <li>धूम्रपान और ज़्यादा शराब पीना</li>
+      <li>परिवार में किसी को मोतियाबिंद होना</li>
+      <li>आँख में चोट, या पहले हुआ आँख का कोई ऑपरेशन</li>
+      <li>लंबे समय तक स्टेरॉयड दवाएँ लेना</li>
+      <li>ज़्यादा धूप में रहना, या शरीर के ऊपरी हिस्से पर रेडिएशन इलाज</li>
+    </ul>
+    <p>बाहर धूप का चश्मा और छज्जे वाली टोपी पहनना, धूम्रपान न करना, और डायबिटीज़ को काबू में रखना आँखों के लिए अच्छा है।</p>
+  </section>
+
+  <section data-section="after-result">
+    <h2>"जाँच कराएँ" या "जल्दी जाँच कराएँ" नतीजे के बाद</h2>
+    <p>जाँच का नतीजा निदान नहीं है। ऐप दोनों तरफ़ गलत हो सकता है। लेकिन यह बताता है कि आँखों की ठीक से जाँच कराना अच्छा रहेगा।</p>
+    <ol class="numbered">
+      <li><b>आँखों की जाँच का समय लें</b> नेत्र रोग विशेषज्ञ (आँखों के डॉक्टर) से, जैसे ज़िला या सरकारी अस्पताल के आँख विभाग में, मेडिकल कॉलेज के अस्पताल में, या किसी धर्मार्थ (चैरिटेबल) आँख अस्पताल में।</li>
+      <li><b>अपना नतीजा साथ ले जाएँ।</b> ऐप में "यह नतीजा सेव या शेयर करें" का इस्तेमाल करें, और ऊपर दिए लक्षणों में से जो भी हों, डॉक्टर को बताएँ।</li>
+      <li><b>जाँच के दौरान</b> डॉक्टर आपकी नज़र जाँचते हैं और एक ख़ास माइक्रोस्कोप (स्लिट लैंप) से लेंस देखते हैं, अक्सर पुतली को फैलाने वाली दवा डालकर। पुतली फैलाई जाए तो किसी को साथ ले जाएँ।</li>
+      <li><b>अगर नतीजा "जल्दी जाँच कराएँ" था</b>, तो जल्द समय लें, ख़ासकर अगर कम दिखने से रोज़ के काम मुश्किल या असुरक्षित हो रहे हों।</li>
+    </ol>
+    <p>अगर ऐप <b>सामान्य</b> बताए लेकिन आपकी नज़र कमज़ोर होती जा रही हो, तब भी आँखों के डॉक्टर को दिखाएँ। कम दिखने के कई कारण होते हैं, मोतियाबिंद उनमें से सिर्फ़ एक है।</p>
+  </section>
+
+  <section data-section="emergency" class="urgent-box">
+    <h2>तुरंत मदद कब लें</h2>
+    <p>मोतियाबिंद धीरे-धीरे बढ़ता है और यह आपातकालीन स्थिति नहीं है। इनमें से कुछ भी हो तो <b>उसी दिन</b> आँख के अस्पताल या इमरजेंसी में जाएँ:</p>
+    <ul class="ticks">
+      <li>एक या दोनों आँखों की रोशनी अचानक चली जाना</li>
+      <li>आँख में दर्द और लाली</li>
+      <li>अचानक रोशनी की चमक दिखना, बहुत सारे नए तैरते धब्बे, या नज़र के आगे परदा या परछाईं आना</li>
+      <li>आँख के ऑपरेशन के बाद के दिनों में बढ़ता दर्द, लाली या कम होती नज़र</li>
+    </ul>
+  </section>
+
+  <section data-section="treatment">
+    <h2>इलाज</h2>
+    <p><b>मोतियाबिंद को हटाने का एकमात्र इलाज ऑपरेशन है।</b> चश्मा या आई-ड्रॉप लेंस को साफ़ नहीं कर सकते।</p>
+    <h3>ऑपरेशन की ज़रूरत से पहले</h3>
+    <p>शुरुआत में नया चश्मा, ज़्यादा रोशनी, चकाचौंध रोकने वाला धूप का चश्मा या मैग्निफ़ाइंग ग्लास मदद कर सकते हैं। कई लोगों को तुरंत ऑपरेशन की ज़रूरत नहीं होती, और इंतज़ार करने से आम तौर पर आँख को नुकसान नहीं होता, न ऑपरेशन मुश्किल होता है। ऑपरेशन का सही समय तब है जब कम दिखने से रोज़ की ज़िंदगी में दिक़्क़त होने लगे।</p>
+    <h3>ऑपरेशन</h3>
+    <p>सर्जन एक छोटे चीरे से धुंधला लेंस निकालकर उसकी जगह साफ़ कृत्रिम लेंस (इंट्राओक्युलर लेंस) लगाते हैं। आँख को दवा की बूँदों या इंजेक्शन से सुन्न किया जाता है, इसलिए दर्द नहीं होता, और ज़्यादातर लोग उसी दिन घर जा सकते हैं। भारत में दो आम तरीक़े हैं: <b>फ़ेकोइमल्सीफ़िकेशन</b> ("फ़ेको"), जिसमें अल्ट्रासाउंड से लेंस को तोड़ा जाता है, और <b>स्मॉल इंसीज़न कैटरेक्ट सर्जरी</b> (SICS)। दोनों अच्छे से काम करते हैं; आपके लिए कौन-सा ठीक है, यह डॉक्टर बताएँगे।</p>
+    <p>अगर दोनों आँखों में मोतियाबिंद है, तो आम तौर पर दोनों का ऑपरेशन अलग-अलग, कुछ हफ़्तों के अंतर पर होता है।</p>
+  </section>
+
+  <section data-section="after-surgery">
+    <h2>ऑपरेशन के बाद</h2>
+    <ul class="ticks">
+      <li>आई-ड्रॉप ठीक वैसे ही डालें जैसे बताया गया है, अक्सर लगभग चार हफ़्तों तक।</li>
+      <li>आँख को न मलें, न दबाएँ, ख़ासकर पहले एक-दो हफ़्ते।</li>
+      <li>पहले कुछ दिन थोड़ा धुंधला दिखना और रोशनी से चुभन होना सामान्य है। धूप का चश्मा मदद करता है।</li>
+      <li>ऑपरेशन के बाद ख़ुद गाड़ी चलाकर घर न जाएँ।</li>
+      <li>लगभग चार हफ़्ते आँखों का मेकअप न करें।</li>
+      <li>पूरी तरह ठीक होने में आम तौर पर दो से छह हफ़्ते लगते हैं। बाद में नए चश्मे की ज़रूरत पड़ सकती है।</li>
+    </ul>
+    <p>अगर दर्द या लाली बढ़े, या नज़र बेहतर होने की जगह कम होने लगे, तो तुरंत अस्पताल से संपर्क करें।</p>
+    <h3>महीनों बाद फिर धुंधला?</h3>
+    <p>मोतियाबिंद वापस नहीं आ सकता, क्योंकि असली लेंस निकाला जा चुका होता है। लेकिन कुछ लोगों में नए लेंस को थामने वाली पतली झिल्ली (कैप्सूल) महीनों या सालों बाद धीरे-धीरे धुंधली हो जाती है। इसे <b>पोस्टीरियर कैप्सूल ओपेसिफ़िकेशन</b> कहते हैं। एक छोटा, बिना दर्द का लेज़र इलाज (YAG लेज़र) इसे साफ़ कर देता है, और आम तौर पर यह एक ही बार करना पड़ता है।</p>
+  </section>
+
+  <section data-section="children">
+    <h2>बच्चों में मोतियाबिंद</h2>
+    <p>बच्चों को भी मोतियाबिंद हो सकता है, जन्म से या बाद में। इसके संकेत हैं: <b>सफ़ेद या सलेटी पुतली</b> (कभी-कभी फ़्लैश वाली फ़ोटो में सफ़ेद चमक दिखती है), आँखों का भटकना, या बच्चे का चेहरों और खिलौनों को न देखना।</p>
+    <p><b>इसके लिए जल्दी आँखों के डॉक्टर को दिखाएँ।</b> छोटे बच्चे की नज़र अभी विकसित हो रही होती है, और समय पर इलाज न हो तो नज़र हमेशा के लिए कमज़ोर ("लेज़ी आई") हो सकती है। यह ऐप बच्चों की आँखों के लिए नहीं बना है।</p>
+  </section>
+
+  <section data-section="myths">
+    <h2>भ्रम और सच</h2>
+    <dl class="myths">
+      <dt>"आई-ड्रॉप से मोतियाबिंद घुल जाता है।"</dt>
+      <dd>मोतियाबिंद को ठीक करने या धीमा करने वाली कोई आई-ड्रॉप मान्य नहीं है। इस पर शोध अभी शुरुआती दौर में है। इलाज ऑपरेशन ही है।</dd>
+      <dt>"मोतियाबिंद पकने तक इंतज़ार करना चाहिए।"</dt>
+      <dd>यह पुराने ऑपरेशन के तरीक़ों से आई पुरानी सलाह है। आज ऑपरेशन तब किया जाता है जब कम दिखने से आपकी ज़िंदगी पर असर पड़े।</dd>
+      <dt>"ऑपरेशन के बाद मोतियाबिंद फिर हो जाता है।"</dt>
+      <dd>ऐसा नहीं हो सकता। नए लेंस के पीछे की झिल्ली बाद में धुंधली हो सकती है, और एक छोटा लेज़र इलाज उसे ठीक कर देता है।</dd>
+      <dt>"मोतियाबिंद सिर्फ़ बुज़ुर्गों को होता है।"</dt>
+      <dd>मुख्य कारण उम्र है, लेकिन डायबिटीज़, चोट, स्टेरॉयड दवाएँ और जन्म से मौजूद कुछ स्थितियाँ किसी भी उम्र में मोतियाबिंद कर सकती हैं।</dd>
+      <dt>"मोतियाबिंद का ऑपरेशन ख़तरनाक है।"</dt>
+      <dd>यह दुनिया के सबसे आम ऑपरेशनों में से एक है। हर ऑपरेशन की तरह इसमें भी कुछ जोखिम है, जो आँखों के डॉक्टर समझाएँगे।</dd>
+    </dl>
+  </section>
+
+  <section data-section="india">
+    <h2>भारत में मुफ़्त और कम ख़र्च वाला इलाज</h2>
+    <ul class="ticks">
+      <li><b>सरकारी कार्यक्रम (NPCBVI):</b> राष्ट्रीय अंधता एवं दृष्टिहीनता नियंत्रण कार्यक्रम के तहत सरकारी अस्पतालों और साझेदार धर्मार्थ अस्पतालों में मोतियाबिंद का ऑपरेशन मुफ़्त होता है, और आँखों की जाँच के शिविर लगाए जाते हैं।</li>
+      <li><b>आयुष्मान भारत (PM-JAY):</b> पात्र परिवारों के लिए इस सरकारी स्वास्थ्य योजना में, योजना से जुड़े अस्पतालों में, मोतियाबिंद का ऑपरेशन शामिल है। पात्रता और अस्पतालों की सूची <a href="https://pmjay.gov.in" rel="noopener">pmjay.gov.in</a> पर है, या अस्पताल के आयुष्मान डेस्क पर पूछें।</li>
+      <li><b>राज्य की योजनाएँ:</b> कई राज्य इनके साथ अपनी स्वास्थ्य योजनाएँ भी चलाते हैं। अपने ज़िला अस्पताल में पूछें।</li>
+    </ul>
+    <p>शुरुआत के लिए सबसे अच्छी जगह पास के ज़िला अस्पताल या सरकारी मेडिकल कॉलेज का आँख विभाग है। वहाँ जाँच होगी और बताया जाएगा कि कौन-सा मुफ़्त या योजना वाला विकल्प आप पर लागू होता है।</p>
+  </section>
+
+  <section data-section="sources">
+    <h2>स्रोत</h2>
+    <p>ये स्रोत अंग्रेज़ी में हैं:</p>
+    <ul class="sources">
+      <li><a href="https://www.nei.nih.gov/learn-about-eye-health/eye-conditions-and-diseases/cataracts" rel="noopener">National Eye Institute (अमेरिका): Cataracts</a></li>
+      <li><a href="https://www.who.int/news-room/fact-sheets/detail/blindness-and-visual-impairment" rel="noopener">विश्व स्वास्थ्य संगठन: Blindness and vision impairment</a></li>
+      <li><a href="https://www.who.int/news/item/08-10-2019-who-launches-first-world-report-on-vision" rel="noopener">विश्व स्वास्थ्य संगठन: World report on vision (2019)</a></li>
+      <li><a href="https://www.nhs.uk/conditions/cataract-surgery/recovery" rel="noopener">NHS (ब्रिटेन): Recovering from cataract surgery</a></li>
+      <li><a href="https://www.rnib.org.uk/your-eyes/eye-conditions-az/posterior-capsule-opacification/" rel="noopener">RNIB (ब्रिटेन): Posterior capsule opacification</a></li>
+      <li><a href="https://aao.org/eye-health/news/dissolving-cataracts-with-eye-drops-instead-of-sur" rel="noopener">American Academy of Ophthalmology: Dissolving cataracts with eye drops?</a></li>
+      <li><a href="https://eyewiki.aao.org/Cataracts_in_Children,_Congenital_and_Acquired" rel="noopener">AAO EyeWiki: Cataracts in children</a></li>
+      <li><a href="https://npcbvi.mohfw.gov.in" rel="noopener">राष्ट्रीय अंधता एवं दृष्टिहीनता नियंत्रण कार्यक्रम (NPCBVI)</a></li>
+      <li><a href="https://pmjay.gov.in" rel="noopener">आयुष्मान भारत PM-JAY</a></li>
+    </ul>
+    <p class="fineprint">एक विद्यार्थी परियोजना के लिए ऊपर दिए स्रोतों से लिखा गया। किसी आँखों के डॉक्टर ने इसकी समीक्षा नहीं की है, और हिंदी अनुवाद की भी जाँच होनी बाकी है। हमेशा अपने डॉक्टर की सलाह मानें।</p>
+  </section>
+
+  <p class="back"><a href="./">← जाँच पर वापस जाएँ</a></p>
+  </article>
+  <article data-lang-block="mr" lang="mr" hidden>
+  <p class="back"><a href="./">← तपासणीकडे परत जा</a></p>
+  <h1>मोतीबिंदू: छोटी माहिती</h1>
+  <p class="lede">तो काय आहे, तपासणीच्या निकालानंतर काय करावे, आणि त्यावर उपचार कसे होतात. खाली दिलेल्या स्रोतांवरून सोप्या भाषेत लिहिलेले.</p>
+  <p class="note">हे पेज सर्वसाधारण माहिती आहे, वैद्यकीय सल्ला नाही. मोतीबिंदूचे निदान आणि उपचाराचा निर्णय फक्त डोळ्यांचे डॉक्टरच करू शकतात.</p>
+
+  <nav class="toc" aria-label="अनुक्रमणिका">
+    <h2>अनुक्रमणिका</h2>
+    <ol>
+      <li><a href="#what">मोतीबिंदू म्हणजे काय?</a></li>
+      <li><a href="#signs">लक्षणे</a></li>
+      <li><a href="#risk">तो कोणाला होतो</a></li>
+      <li><a href="#after-result">"तपासणी करा" किंवा "लवकर तपासणी करा" निकालानंतर</a></li>
+      <li><a href="#emergency">ताबडतोब मदत केव्हा घ्यावी</a></li>
+      <li><a href="#treatment">उपचार</a></li>
+      <li><a href="#after-surgery">शस्त्रक्रियेनंतर</a></li>
+      <li><a href="#children">मुलांमधील मोतीबिंदू</a></li>
+      <li><a href="#myths">गैरसमज आणि सत्य</a></li>
+      <li><a href="#india">भारतातील मोफत आणि कमी खर्चाचे उपचार</a></li>
+      <li><a href="#sources">स्रोत</a></li>
+    </ol>
+  </nav>
+
+  <section data-section="what">
+    <h2>मोतीबिंदू म्हणजे काय?</h2>
+    <figure class="lens-figure" aria-hidden="true">
+      <svg viewBox="0 0 320 120"><use href="#lens-pair"/></svg>
+      <figcaption><span>स्वच्छ भिंग: बाहुली काळी दिसते</span><span>मोतीबिंदू: भिंग धूसर होते</span></figcaption>
+    </figure>
+    <p>डोळ्याच्या रंगीत भागामागे (आयरिस) एक लहान, स्वच्छ <b>भिंग</b> (लेन्स) असते, जे कॅमेऱ्याच्या लेन्ससारखे प्रकाश केंद्रित करते. हे भिंग हळूहळू धूसर होऊ लागते, त्याला <b>मोतीबिंदू</b> म्हणतात. त्यामुळे पाहणे धूसर किंवा मळलेल्या काचेतून पाहिल्यासारखे वाटते.</p>
+    <p>बहुतेक मोतीबिंदू वयानुसार होतात आणि वर्षानुवर्षे हळूहळू वाढतात. ते खूप सामान्य आहेत आणि त्यावर उपचार होऊ शकतात: एका छोट्या शस्त्रक्रियेत धूसर भिंगाच्या जागी स्वच्छ कृत्रिम भिंग बसवले जाते.</p>
+    <p>जगभरात अंधत्वाचे एक मोठे कारण मोतीबिंदू आहे. जागतिक आरोग्य संघटनेनुसार (WHO), ज्यांना मोतीबिंदूच्या शस्त्रक्रियेची गरज आहे त्यांच्यापैकी सुमारे निम्म्या लोकांना ती मिळत नाही. म्हणूनच सोपी तपासणी महत्त्वाची आहे.</p>
+  </section>
+
+  <section data-section="signs">
+    <h2>लक्षणे</h2>
+    <p>सुरुवातीला मोतीबिंदूची अनेकदा <b>कोणतीही लक्षणे नसतात</b>. तो वाढल्यावर लोकांना हे जाणवते:</p>
+    <ul class="ticks">
+      <li>धूसर किंवा अस्पष्ट दिसणे</li>
+      <li>रंग फिकट किंवा पिवळसर दिसणे</li>
+      <li>चकाकी: प्रकाश खूप प्रखर वाटणे किंवा दिव्याभोवती वलय दिसणे</li>
+      <li>रात्री पाहण्यास त्रास, उदा. गाडी चालवताना</li>
+      <li>एका डोळ्याने दोन-दोन वस्तू दिसणे</li>
+      <li>चष्म्याचा नंबर वारंवार बदलणे</li>
+    </ul>
+    <p>वाढलेल्या मोतीबिंदूत बाहुली काळ्याऐवजी करडी किंवा पांढरी दिसू शकते. हे अ‍ॅप कॅमेऱ्याद्वारे नेमके हेच शोधते.</p>
+  </section>
+
+  <section data-section="risk">
+    <h2>तो कोणाला होतो</h2>
+    <p>सर्वात मोठे कारण वाढते वय आहे. याशिवाय यांमुळे धोका वाढतो:</p>
+    <ul class="ticks">
+      <li>मधुमेह (डायबेटीस)</li>
+      <li>धूम्रपान आणि जास्त मद्यपान</li>
+      <li>कुटुंबात कोणाला मोतीबिंदू असणे</li>
+      <li>डोळ्याला इजा, किंवा पूर्वी झालेली डोळ्याची शस्त्रक्रिया</li>
+      <li>दीर्घ काळ स्टेरॉइड औषधे घेणे</li>
+      <li>खूप उन्हात राहणे, किंवा शरीराच्या वरच्या भागावर रेडिएशन उपचार</li>
+    </ul>
+    <p>बाहेर गॉगल आणि कडा असलेली टोपी वापरणे, धूम्रपान न करणे, आणि मधुमेह नियंत्रणात ठेवणे डोळ्यांसाठी चांगले आहे.</p>
+  </section>
+
+  <section data-section="after-result">
+    <h2>"तपासणी करा" किंवा "लवकर तपासणी करा" निकालानंतर</h2>
+    <p>तपासणीचा निकाल म्हणजे निदान नाही. अ‍ॅप दोन्ही बाजूंनी चुकू शकते. पण त्यातून कळते की डोळ्यांची नीट तपासणी करून घेणे चांगले.</p>
+    <ol class="numbered">
+      <li><b>डोळ्यांच्या तपासणीची वेळ घ्या</b> नेत्ररोगतज्ज्ञांकडे (डोळ्यांच्या डॉक्टरांकडे), उदा. जिल्हा किंवा सरकारी रुग्णालयाचा नेत्र विभाग, वैद्यकीय महाविद्यालयाचे रुग्णालय, किंवा धर्मादाय (चॅरिटेबल) नेत्र रुग्णालय.</li>
+      <li><b>तुमचा निकाल सोबत न्या.</b> अ‍ॅपमधील "हा निकाल सेव्ह किंवा शेअर करा" वापरा, आणि वरीलपैकी जी लक्षणे असतील ती डॉक्टरांना सांगा.</li>
+      <li><b>तपासणीत</b> डॉक्टर तुमची दृष्टी तपासतात आणि एका विशेष सूक्ष्मदर्शकाने (स्लिट लॅम्प) भिंग पाहतात, अनेकदा बाहुली मोठी करणारे थेंब घालून. बाहुली मोठी केली जाणार असेल तर कोणाला तरी सोबत न्या.</li>
+      <li><b>निकाल "लवकर तपासणी करा" असेल</b> तर लवकर वेळ घ्या, विशेषतः कमी दिसण्यामुळे रोजची कामे अवघड किंवा असुरक्षित होत असतील तर.</li>
+    </ol>
+    <p>अ‍ॅपने <b>सामान्य</b> सांगितले तरी तुमची दृष्टी कमी होत असेल, तर डोळ्यांच्या डॉक्टरांना दाखवाच. कमी दिसण्याची अनेक कारणे असतात, मोतीबिंदू त्यांपैकी फक्त एक आहे.</p>
+  </section>
+
+  <section data-section="emergency" class="urgent-box">
+    <h2>ताबडतोब मदत केव्हा घ्यावी</h2>
+    <p>मोतीबिंदू हळूहळू वाढतो आणि ती आणीबाणी नाही. यांपैकी काहीही झाल्यास <b>त्याच दिवशी</b> नेत्र रुग्णालयात किंवा आपत्कालीन विभागात जा:</p>
+    <ul class="ticks">
+      <li>एका किंवा दोन्ही डोळ्यांची दृष्टी अचानक जाणे</li>
+      <li>दुखणारा, लाल डोळा</li>
+      <li>अचानक प्रकाशाचे झोत दिसणे, अनेक नवे तरंगणारे ठिपके, किंवा नजरेसमोर पडदा किंवा सावली येणे</li>
+      <li>डोळ्याच्या शस्त्रक्रियेनंतरच्या दिवसांत वाढणारे दुखणे, लाली किंवा कमी होणारी दृष्टी</li>
+    </ul>
+  </section>
+
+  <section data-section="treatment">
+    <h2>उपचार</h2>
+    <p><b>मोतीबिंदू काढण्याचा एकमेव उपचार म्हणजे शस्त्रक्रिया.</b> चष्मा किंवा डोळ्यांचे थेंब भिंग स्वच्छ करू शकत नाहीत.</p>
+    <h3>शस्त्रक्रियेची गरज भासण्याआधी</h3>
+    <p>सुरुवातीला नवा चष्मा, जास्त उजेड, चकाकी कमी करणारा गॉगल किंवा भिंगकाच (मॅग्निफायर) मदत करू शकतात. अनेकांना लगेच शस्त्रक्रियेची गरज नसते, आणि थांबल्याने सहसा डोळ्याला इजा होत नाही किंवा शस्त्रक्रिया अवघड होत नाही. कमी दिसण्यामुळे रोजच्या आयुष्यात अडचण येऊ लागते तेव्हा शस्त्रक्रियेची योग्य वेळ असते.</p>
+    <h3>शस्त्रक्रिया</h3>
+    <p>सर्जन एका लहान छेदातून धूसर भिंग काढतात आणि त्याच्या जागी स्वच्छ कृत्रिम भिंग (इंट्राऑक्युलर लेन्स) बसवतात. डोळा थेंबांनी किंवा इंजेक्शनने बधिर केला जातो, त्यामुळे दुखत नाही, आणि बहुतेक लोक त्याच दिवशी घरी जातात. भारतात दोन सामान्य पद्धती आहेत: <b>फेकोइमल्सिफिकेशन</b> ("फेको"), ज्यात अल्ट्रासाउंडने भिंगाचे तुकडे केले जातात, आणि <b>स्मॉल इन्सिजन कॅटरॅक्ट सर्जरी</b> (SICS). दोन्ही चांगल्या प्रकारे काम करतात; तुमच्यासाठी कोणती योग्य, हे डॉक्टर सांगतील.</p>
+    <p>दोन्ही डोळ्यांत मोतीबिंदू असल्यास, सहसा दोन्ही डोळ्यांची शस्त्रक्रिया वेगवेगळी, काही आठवड्यांच्या अंतराने केली जाते.</p>
+  </section>
+
+  <section data-section="after-surgery">
+    <h2>शस्त्रक्रियेनंतर</h2>
+    <ul class="ticks">
+      <li>डोळ्यांचे थेंब सांगितल्याप्रमाणेच घाला, अनेकदा सुमारे चार आठवडे.</li>
+      <li>डोळा चोळू किंवा दाबू नका, विशेषतः पहिले एक-दोन आठवडे.</li>
+      <li>पहिले काही दिवस थोडे धूसर दिसणे आणि प्रकाशाचा त्रास होणे सामान्य आहे. गॉगल मदत करतो.</li>
+      <li>शस्त्रक्रियेनंतर स्वतः गाडी चालवत घरी जाऊ नका.</li>
+      <li>सुमारे चार आठवडे डोळ्यांचा मेकअप करू नका.</li>
+      <li>पूर्ण बरे होण्यास सहसा दोन ते सहा आठवडे लागतात. नंतर नव्या चष्म्याची गरज भासू शकते.</li>
+    </ul>
+    <p>दुखणे किंवा लाली वाढल्यास, किंवा दृष्टी सुधारण्याऐवजी कमी होऊ लागल्यास, ताबडतोब रुग्णालयाशी संपर्क साधा.</p>
+    <h3>काही महिन्यांनी पुन्हा धूसर?</h3>
+    <p>मोतीबिंदू परत येऊ शकत नाही, कारण नैसर्गिक भिंग काढलेले असते. पण काही लोकांमध्ये नवे भिंग धरून ठेवणारे पातळ आवरण (कॅप्सूल) काही महिन्यांनी किंवा वर्षांनी हळूहळू धूसर होते. याला <b>पोस्टिरियर कॅप्सूल ओपॅसिफिकेशन</b> म्हणतात. एक छोटा, न दुखणारा लेझर उपचार (YAG लेझर) ते स्वच्छ करतो, आणि सहसा तो एकदाच करावा लागतो.</p>
+  </section>
+
+  <section data-section="children">
+    <h2>मुलांमधील मोतीबिंदू</h2>
+    <p>मुलांनाही मोतीबिंदू होऊ शकतो, जन्मापासून किंवा नंतर. त्याची चिन्हे: <b>पांढरी किंवा करडी बाहुली</b> (कधी कधी फ्लॅशच्या फोटोत पांढरी चमक दिसते), डोळे भरकटणे, किंवा मूल चेहरे आणि खेळणी न पाहणे.</p>
+    <p><b>यासाठी लवकर डोळ्यांच्या डॉक्टरांना दाखवा.</b> लहान मुलाची दृष्टी अजून विकसित होत असते, आणि वेळेवर उपचार न झाल्यास दृष्टी कायमची कमकुवत ("आळशी डोळा") होऊ शकते. हे अ‍ॅप मुलांच्या डोळ्यांसाठी बनवलेले नाही.</p>
+  </section>
+
+  <section data-section="myths">
+    <h2>गैरसमज आणि सत्य</h2>
+    <dl class="myths">
+      <dt>"डोळ्यांच्या थेंबांनी मोतीबिंदू विरघळतो."</dt>
+      <dd>मोतीबिंदू बरा करणारे किंवा मंदावणारे कोणतेही थेंब मान्यताप्राप्त नाहीत. यावरील संशोधन अजून सुरुवातीच्या टप्प्यात आहे. उपचार शस्त्रक्रियाच आहे.</dd>
+      <dt>"मोतीबिंदू पिकेपर्यंत थांबावे."</dt>
+      <dd>हा जुन्या शस्त्रक्रिया पद्धतींमधून आलेला जुना सल्ला आहे. आज कमी दिसण्याचा तुमच्या आयुष्यावर परिणाम होऊ लागला की शस्त्रक्रिया केली जाते.</dd>
+      <dt>"शस्त्रक्रियेनंतर मोतीबिंदू पुन्हा होतो."</dt>
+      <dd>तसे होऊ शकत नाही. नव्या भिंगामागचे आवरण नंतर धूसर होऊ शकते, आणि एक छोटा लेझर उपचार ते दुरुस्त करतो.</dd>
+      <dt>"मोतीबिंदू फक्त वृद्धांनाच होतो."</dt>
+      <dd>मुख्य कारण वय आहे, पण मधुमेह, इजा, स्टेरॉइड औषधे आणि जन्मापासूनच्या काही स्थितींमुळे कोणत्याही वयात मोतीबिंदू होऊ शकतो.</dd>
+      <dt>"मोतीबिंदूची शस्त्रक्रिया धोकादायक आहे."</dt>
+      <dd>ही जगातील सर्वात सामान्य शस्त्रक्रियांपैकी एक आहे. प्रत्येक शस्त्रक्रियेप्रमाणे यातही काही धोका असतो, जो डोळ्यांचे डॉक्टर समजावून सांगतील.</dd>
+    </dl>
+  </section>
+
+  <section data-section="india">
+    <h2>भारतातील मोफत आणि कमी खर्चाचे उपचार</h2>
+    <ul class="ticks">
+      <li><b>सरकारी कार्यक्रम (NPCBVI):</b> राष्ट्रीय अंधत्व आणि दृष्टिदोष नियंत्रण कार्यक्रमाअंतर्गत सरकारी रुग्णालये आणि भागीदार धर्मादाय रुग्णालयांत मोतीबिंदूची शस्त्रक्रिया मोफत होते, आणि डोळे तपासणी शिबिरे घेतली जातात.</li>
+      <li><b>आयुष्मान भारत (PM-JAY):</b> पात्र कुटुंबांसाठी या सरकारी आरोग्य योजनेत, योजनेशी जोडलेल्या रुग्णालयांत, मोतीबिंदूची शस्त्रक्रिया समाविष्ट आहे. पात्रता आणि रुग्णालयांची यादी <a href="https://pmjay.gov.in" rel="noopener">pmjay.gov.in</a> वर आहे, किंवा रुग्णालयातील आयुष्मान कक्षात विचारा.</li>
+      <li><b>राज्यांच्या योजना:</b> अनेक राज्ये यांच्यासोबत स्वतःच्या आरोग्य योजनाही चालवतात. तुमच्या जिल्हा रुग्णालयात विचारा.</li>
+    </ul>
+    <p>सुरुवातीसाठी सर्वात चांगले ठिकाण म्हणजे जवळच्या जिल्हा रुग्णालयाचा किंवा सरकारी वैद्यकीय महाविद्यालयाचा नेत्र विभाग. तिथे तपासणी होईल आणि कोणता मोफत किंवा योजनेतील पर्याय तुम्हाला लागू होतो ते सांगितले जाईल.</p>
+  </section>
+
+  <section data-section="sources">
+    <h2>स्रोत</h2>
+    <p>हे स्रोत इंग्रजीत आहेत:</p>
+    <ul class="sources">
+      <li><a href="https://www.nei.nih.gov/learn-about-eye-health/eye-conditions-and-diseases/cataracts" rel="noopener">National Eye Institute (अमेरिका): Cataracts</a></li>
+      <li><a href="https://www.who.int/news-room/fact-sheets/detail/blindness-and-visual-impairment" rel="noopener">जागतिक आरोग्य संघटना: Blindness and vision impairment</a></li>
+      <li><a href="https://www.who.int/news/item/08-10-2019-who-launches-first-world-report-on-vision" rel="noopener">जागतिक आरोग्य संघटना: World report on vision (2019)</a></li>
+      <li><a href="https://www.nhs.uk/conditions/cataract-surgery/recovery" rel="noopener">NHS (ब्रिटन): Recovering from cataract surgery</a></li>
+      <li><a href="https://www.rnib.org.uk/your-eyes/eye-conditions-az/posterior-capsule-opacification/" rel="noopener">RNIB (ब्रिटन): Posterior capsule opacification</a></li>
+      <li><a href="https://aao.org/eye-health/news/dissolving-cataracts-with-eye-drops-instead-of-sur" rel="noopener">American Academy of Ophthalmology: Dissolving cataracts with eye drops?</a></li>
+      <li><a href="https://eyewiki.aao.org/Cataracts_in_Children,_Congenital_and_Acquired" rel="noopener">AAO EyeWiki: Cataracts in children</a></li>
+      <li><a href="https://npcbvi.mohfw.gov.in" rel="noopener">राष्ट्रीय अंधत्व आणि दृष्टिदोष नियंत्रण कार्यक्रम (NPCBVI)</a></li>
+      <li><a href="https://pmjay.gov.in" rel="noopener">आयुष्मान भारत PM-JAY</a></li>
+    </ul>
+    <p class="fineprint">एका विद्यार्थी प्रकल्पासाठी वरील स्रोतांवरून लिहिलेले. कोणत्याही डोळ्यांच्या डॉक्टरांनी याचा आढावा घेतलेला नाही, आणि मराठी भाषांतराचीही तपासणी व्हायची आहे. नेहमी तुमच्या डॉक्टरांचा सल्ला पाळा.</p>
+  </section>
+
+  <p class="back"><a href="./">← तपासणीकडे परत जा</a></p>
+  </article>
 </main>
+<script>
+  // Section links (#after-result and the contents list) must work in every language, so only the
+  // visible article's sections carry the ids.
+  function wireSections() {
+    document.querySelectorAll("[data-section]").forEach((s) => s.removeAttribute("id"));
+    const visible = document.querySelector("article[data-lang-block]:not([hidden])");
+    if (!visible) return;
+    visible.querySelectorAll("[data-section]").forEach((s) => { s.id = s.dataset.section; });
+    if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
+  }
+  document.addEventListener("DOMContentLoaded", () => { wireSections(); window.i18n.onChange(wireSections); });
+</script>
 </body>
 </html>

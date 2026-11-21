@@ -9,19 +9,26 @@
 //                       (as in the laptop demo).
 
 import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs";
-import * as V from "./vision.js?v=7";   // bump ?v= (here and in index.html) on every release: Pages caches ~10 min
+import * as V from "./vision.js?v=8";   // bump ?v= (here and in index.html) on every release: Pages caches ~10 min
 
 const MEDIAPIPE_WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/wasm";
 const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
 const ORT_DIST = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/";
 const BURST_WALL_TIMEOUT_MS = 10000;   // give up on a burst after this long, even if no face is seen
 const MAX_PHOTO_SIDE = 2048;            // large photos are scaled down to this before analysis
-const FACE_EYES = [["L", V.LEFT_IRIS, "Left eye"], ["R", V.RIGHT_IRIS, "Right eye"]];
-const OUTPUT_TEXT = {
-  normal: ["NORMAL", "No cataract-like signs found by the prototype."],
-  refer: ["REFER", "Cataract-like appearance. A real screening app would advise an eye check-up."],
-  urgent: ["URGENT", "Looks like an advanced (mature) cataract to the prototype. A real screening app would advise an early eye check-up."],
+const FACE_EYES = [["L", V.LEFT_IRIS], ["R", V.RIGHT_IRIS]];
+
+// All visible text comes from i18n.js (English, Hindi, Marathi).
+const t = (key, vars) => window.i18n.t(key, vars);
+// vision.js reports reasons as English phrases; map them to translation keys.
+const REASON_KEYS = {
+  "TOO BLURRY": "q_blurry", "TOO DARK": "q_dark", "OVEREXPOSED / GLARE": "q_bright",
+  "no face found": "st_no_face", "show the whole face (eyes not found reliably)": "st_whole_face",
+  "too far away: move closer": "st_too_far",
 };
+const reasonText = (reason) => (REASON_KEYS[reason] ? t(REASON_KEYS[reason]) : reason.toLowerCase());
+/** Title for a result: an eye code ("L"/"R") or a generic key ("photo", "analysis"). */
+const whoText = (who) => (who === "L" || who === "R" ? t(`eye_owner_${who}`) : t(who));
 const COLORS = { pass: "#2fbf55", fail: "#ff4d4d", busy: "#4c9cff" };
 const AUTO_HOLD_MS = 1200;              // auto-capture once the picture has stayed good this long
 const ALIGNED_CUE_GAP_MS = 1500;        // don't repeat the "lined up" beep more often than this
@@ -120,12 +127,15 @@ async function loadModels() {
       createLandmarker(),
     ]);
     Object.assign(state, { config, session, landmarker });
+    state.loadState = "ready";
     $("start").disabled = false;
-    $("start").textContent = "Start camera";
-    setStatus("load-status", "Ready.");
+    $("start").textContent = t("start");
+    setStatus("load-status", t("ready"));
   } catch (e) {
-    $("start").textContent = "Models failed to load";
-    setStatus("load-status", `Could not load the models (${e.message}). Check the internet connection and reload the page.`, true);
+    state.loadState = "failed";
+    state.loadError = e.message;
+    $("start").textContent = t("models_failed");
+    setStatus("load-status", t("models_failed_msg", { msg: e.message }), true);
     throw e;
   }
 }
@@ -183,7 +193,7 @@ function applyModeToCameraScreen() {
   const closeup = state.mode === "closeup";
   $("closeup-controls").hidden = !closeup;
   $("eyestate-R").hidden = closeup;
-  $("eyestate-L-title").textContent = closeup ? "Eye" : "Left eye";
+  $("eyestate-L-title").textContent = closeup ? t("eye_generic") : t("eye_left");
 }
 
 async function startCamera() {
@@ -192,7 +202,7 @@ async function startCamera() {
   const facing = selected("facing");
   if (!navigator.mediaDevices?.getUserMedia) {
     show("intro");
-    setStatus("load-status", "This browser cannot open the camera here. The page must be opened over https (or localhost).", true);
+    setStatus("load-status", t("err_no_camera_api"), true);
     return;
   }
   try {
@@ -200,9 +210,7 @@ async function startCamera() {
       video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false });
   } catch (e) {
     show("intro");
-    setStatus("load-status", e.name === "NotAllowedError"
-      ? "Camera access was refused. Allow the camera for this site in the browser settings, then try again."
-      : `Could not open the camera (${e.message}).`, true);
+    setStatus("load-status", e.name === "NotAllowedError" ? t("err_camera_denied") : t("err_camera", { msg: e.message }), true);
     return;
   }
   const video = $("video");
@@ -310,7 +318,7 @@ function onCloseupFrame(video) {
   ctx.setLineDash([12, 10]);
   ctx.strokeRect(box.x1, box.y1, box.x2 - box.x1, box.y2 - box.y1);
   ctx.setLineDash([]);
-  setEyeState("L", hold > 0 ? "hold still…" : q.passed ? "sharp, well lit: iris in the ring?" : q.reason.toLowerCase(), q.passed);
+  setEyeState("L", hold > 0 ? t("st_hold") : q.passed ? t("st_ok_ring") : reasonText(q.reason), q.passed);
   $("capture").disabled = capturing() || !q.passed;
 }
 
@@ -321,19 +329,19 @@ function onFaceFrame(video, face) {
   let anyPassed = false;
   const check = face ? V.faceCheck(face, vw, vh) : { ok: false, reason: "no face found" };
   for (const [label, ids] of FACE_EYES) {
-    if (!check.ok) { setEyeState(label, check.reason, false); continue; }
+    if (!check.ok) { setEyeState(label, reasonText(check.reason), false); continue; }
     const box = V.eyeBox(face, ids, vw, vh);
-    if (!box.valid) { setEyeState(label, "out of view", false); continue; }
+    if (!box.valid) { setEyeState(label, t("st_out_of_view"), false); continue; }
     const crop = grabRegion(video, box.x1, box.y1, box.x2, box.y2);
     const q = V.qualityCheck(crop);
     state.collectors[label].offer(crop, box.irisRadius, box.cropRadius, q.passed);
     anyPassed ||= q.passed;
     ctx.strokeStyle = busy ? COLORS.busy : q.passed ? COLORS.pass : COLORS.fail;
     ctx.strokeRect(box.x1, box.y1, box.x2 - box.x1, box.y2 - box.y1);
-    setEyeState(label, q.passed ? "sharp, well lit" : q.reason.toLowerCase(), q.passed);
+    setEyeState(label, q.passed ? t("st_ok") : reasonText(q.reason), q.passed);
   }
   const hold = updateSteady(anyPassed);
-  if (!busy) setStatus("camera-status", hold > 0 ? "Hold still…" : "");
+  if (!busy) setStatus("camera-status", hold > 0 ? t("status_hold") : "");
   $("capture").disabled = busy || !anyPassed;
 }
 
@@ -356,32 +364,30 @@ function startBurst() {
   Object.values(state.collectors).forEach((c) => c.start());
   state.burstStarted = performance.now();
   $("progress").hidden = false;
-  setStatus("camera-status", "Capturing - hold still…");
+  setStatus("camera-status", t("status_capturing"));
 }
 
 async function finishBurst() {
   state.processing = true;
-  setStatus("camera-status", "Analysing…");
+  setStatus("camera-status", t("status_analysing"));
   await new Promise((r) => setTimeout(r, 30));   // let the status paint before the heavy work
   const results = [];
-  const eyes = state.mode === "closeup"
-    ? [["E", `${selected("which-eye") === "L" ? "Left" : "Right"} eye`]]
-    : FACE_EYES.map(([label, , name]) => [label, name]);
-  const advice = state.mode === "closeup"
-    ? "Hold the phone steady 10-15 cm from the eye, wait for the picture to be sharp, and use brighter, even light."
-    : "Hold the phone steadier, keep the whole face in view and use brighter, even light.";
+  // [collector, eye code]; errors are functions so they re-translate if the language changes
+  const eyes = state.mode === "closeup" ? [["E", selected("which-eye")]] : FACE_EYES.map(([label]) => [label, label]);
+  const adviceKey = state.mode === "closeup" ? "advice_closeup" : "advice_face";
   try {
-    for (const [label, name] of eyes) {
+    for (const [label, who] of eyes) {
       const c = state.collectors[label];
       if (c.ready()) {
-        results.push(await analyse(name, c.crops, c.irisRadii, c.cropRadii, { burst: true }));
+        results.push(await analyse(who, c.crops, c.irisRadii, c.cropRadii, { burst: true }));
       } else if (c.pending) {
-        results.push({ name, error: `Only ${c.crops.length} of ${c.nFrames} sharp frames were captured. ${advice}` });
+        const n = c.crops.length, total = c.nFrames;
+        results.push({ who, error: () => t("burst_short", { n, total, advice: t(adviceKey) }) });
       }
       c.pending = false;
     }
   } catch (e) {
-    results.push({ name: "Analysis", error: `Something went wrong (${e.message}).` });
+    results.push({ who: "analysis", error: () => t("err_generic", { msg: e.message }) });
   }
   stopCamera();
   state.processing = false;
@@ -391,12 +397,12 @@ async function finishBurst() {
 
 // ---------- analysis ----------
 
-async function analyse(name, crops, irisRadii, cropRadii, info) {
+async function analyse(who, crops, irisRadii, cropRadii, info) {
   const res = V.glareSeparation(crops, irisRadii, cropRadii);
   const input = V.classifierInput(res, irisRadii, cropRadii);
   const out = await state.session.run({ image: new ort.Tensor("float32", input, [1, 224, 224, 3]) });
   const cataract = out.cataract_score.data[0], mature = out.mature_score.data[0];
-  return { name, res, lastFrame: crops[crops.length - 1], cataract, mature,
+  return { who, res, lastFrame: crops[crops.length - 1], cataract, mature,
            output: V.decide(cataract, mature, state.config), ...info };
 }
 
@@ -413,20 +419,20 @@ async function analysePhotoSource(source, width, height) {
   const canvas = photoCanvas(source, width, height);
   await setRunningMode("IMAGE");
   const face = state.landmarker.detect(canvas).faceLandmarks?.[0];
-  if (!face) return [{ name: "Photo", error: "No face was found. Use a photo that shows the whole face, looking at the camera." }];
+  if (!face) return [{ who: "photo", error: () => t("photo_no_face") }];
   const check = V.faceCheck(face, canvas.width, canvas.height);
   if (!check.ok) {
-    return [{ name: "Photo", error: `Can't analyse this photo: ${check.reason}. The app needs a photo of the whole face, looking at the camera, taken from about 15-25 cm.` }];
+    return [{ who: "photo", error: () => t("photo_bad", { reason: reasonText(check.reason) }) }];
   }
   const results = [];
-  for (const [, ids, name] of FACE_EYES) {
+  for (const [who, ids] of FACE_EYES) {
     const box = V.eyeBox(face, ids, canvas.width, canvas.height);
-    if (!box.valid) { results.push({ name, error: "This eye is outside the photo." }); continue; }
+    if (!box.valid) { results.push({ who, error: () => t("photo_eye_outside") }); continue; }
     const crop = grabRegion(canvas, box.x1, box.y1, box.x2, box.y2);
     const q = V.qualityCheck(crop);
     const eye = V.resize(crop, V.EYE_CROP_SIZE, V.EYE_CROP_SIZE, "area");
     const frames = Array(V.BURST_FRAMES).fill(eye);   // one photo: no glare separation possible
-    results.push(await analyse(name, frames, Array(frames.length).fill(box.irisRadius),
+    results.push(await analyse(who, frames, Array(frames.length).fill(box.irisRadius),
                                Array(frames.length).fill(box.cropRadius), { photo: true, quality: q, faceCheck: check }));
   }
   return results;
@@ -434,14 +440,14 @@ async function analysePhotoSource(source, width, height) {
 
 async function analysePhotoFile(file) {
   show("intro");
-  setStatus("load-status", "Analysing the photo…");
+  setStatus("load-status", t("photo_analysing"));
   try {
     const bitmap = await createImageBitmap(file);
     const results = await analysePhotoSource(bitmap, bitmap.width, bitmap.height);
-    setStatus("load-status", "Ready.");
+    setStatus("load-status", t("ready"));
     renderResults(results);
   } catch (e) {
-    setStatus("load-status", `Could not read that photo (${e.message}).`, true);
+    setStatus("load-status", t("photo_read_error", { msg: e.message }), true);
   }
 }
 
@@ -476,42 +482,44 @@ function meter(score) {
   const cut = 100 * state.config.screen_threshold;
   const bar = el("div", { class: "meter" }, el("i", { style: `left:${(100 * Math.min(Math.max(score, 0), 1)).toFixed(1)}%` }));
   bar.style.background = `linear-gradient(90deg, var(--ok) 0 ${cut}%, var(--refer) ${cut}% 100%)`;
-  return [bar, el("div", { class: "scale" }, el("span", {}, "clear"),
-                  el("span", {}, `cut-off ${state.config.screen_threshold.toFixed(2)}`), el("span", {}, "cloudy"))];
+  return [bar, el("div", { class: "scale" }, el("span", {}, t("meter_clear")),
+                  el("span", {}, t("meter_cut", { c: state.config.screen_threshold.toFixed(2) })), el("span", {}, t("meter_cloudy")))];
+}
+
+function resultNotes(r) {
+  const notes = [t("note_score", { s: r.cataract.toFixed(2) })];
+  if (r.output !== "normal") notes.push(t("note_severity", { s: r.mature.toFixed(2), t: state.config.severity_threshold.toFixed(2) }));
+  notes.push(r.photo ? t("note_single") : t("note_frames", { n: V.BURST_FRAMES }));
+  if (r.photo && !r.quality.passed) notes.push(t("note_quality", { reason: reasonText(r.quality.reason) }));
+  return notes.join(" · ");
 }
 
 function renderResults(results) {
+  state.lastResults = results;
   const box = $("result-cards");
   box.replaceChildren();
   for (const r of results) {
-    const title = el("div", { class: "result-eye" }, eyeIcon(),
-                     el("span", {}, r.error ? r.name : `${r.name} (person's ${r.name.split(" ")[0].toLowerCase()})`));
+    const title = el("div", { class: "result-eye" }, eyeIcon(), el("span", {}, whoText(r.who)));
     if (r.error) {
       box.append(el("div", { class: "result" }, title,
-        el("div", { class: "verdict none" }, el("small", {}, "Result"), el("strong", {}, "No result")),
-        el("div", { class: "explain" }, el("p", {}, r.error))));
+        el("div", { class: "verdict none" }, el("small", {}, t("res_result")), el("strong", {}, t("res_none"))),
+        el("div", { class: "explain" }, el("p", {}, r.error()))));
       continue;
     }
-    const [word, text] = OUTPUT_TEXT[r.output];
     const photo = el("canvas", { class: "eye-photo" });
     drawRGB(photo, r.res.medianColor);
-    const notes = [`Score ${r.cataract.toFixed(2)}`];
-    if (r.output !== "normal") notes.push(`severity ${r.mature.toFixed(2)} (urgent from ${state.config.severity_threshold.toFixed(2)})`);
-    notes.push(r.photo ? "single photo, glare separation skipped" : `${V.BURST_FRAMES} frames, glare removed`);
-    if (r.photo && !r.quality.passed) notes.push(`photo quality: ${r.quality.reason.toLowerCase()}, so treat with extra caution`);
     const panels = el("div", { class: "panels" },
-      figure(r.lastFrame, "last frame"),
-      figure(r.res.medianColor, "de-glared"),
-      figure(withMaskInRed(r.res.medianColor, r.res.opacityMask), `fixed bright area ${(100 * r.res.opacityFraction).toFixed(1)}%`),
-      figure(r.res.glareMask, "moving glare"));
+      figure(r.lastFrame, t("panel_last")),
+      figure(r.res.medianColor, t("panel_median")),
+      figure(withMaskInRed(r.res.medianColor, r.res.opacityMask), t("panel_opacity", { p: (100 * r.res.opacityFraction).toFixed(1) })),
+      figure(r.res.glareMask, t("panel_glare")));
     box.append(el("div", { class: "result" }, title, photo,
-      el("div", { class: `verdict ${r.output}` }, el("small", {}, "Result"),
-         el("strong", {}, word[0] + word.slice(1).toLowerCase())),
+      el("div", { class: `verdict ${r.output}` }, el("small", {}, t("res_result")), el("strong", {}, t(`out_${r.output}`))),
       ...meter(r.cataract),
       el("div", { class: "explain" },
-        el("p", {}, text),
-        el("p", { class: "meta" }, notes.join(" · ")),
-        el("details", {}, el("summary", {}, "Show processing steps"), panels))));
+        el("p", {}, t(`out_${r.output}_text`)),
+        el("p", { class: "meta" }, resultNotes(r)),
+        el("details", {}, el("summary", {}, t("show_steps")), panels))));
   }
   $("other-eye").hidden = !(state.mode === "closeup" && results.some((r) => r.burst));
   state.reportFile = null;
@@ -528,7 +536,7 @@ function renderResults(results) {
 const REPORT = {
   width: 1080, bg: "#f6f4ef", ink: "#13231f", muted: "#5d6b66", line: "#dcd8cf", accent: "#0e6b5c", soft: "#e1ece7",
   colors: { normal: "#1d7a4a", refer: "#a3620a", urgent: "#b3321f" },
-  serif: "Newsreader, Georgia, serif", sans: "'IBM Plex Sans', system-ui, sans-serif",
+  serif: "Newsreader, 'Noto Serif Devanagari', Georgia, serif", sans: "'IBM Plex Sans', 'Noto Sans Devanagari', system-ui, sans-serif",
 };
 
 function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
@@ -559,7 +567,10 @@ function drawLogo(ctx, x, y, size) {
 }
 
 async function buildReport(results) {
-  try { await Promise.all([document.fonts.load(`500 40px Newsreader`), document.fonts.load(`400 20px "IBM Plex Sans"`)]); } catch { /* system fonts */ }
+  try {
+    await Promise.all([document.fonts.load(`500 40px Newsreader`), document.fonts.load(`400 20px "IBM Plex Sans"`),
+      document.fonts.load(`500 40px "Noto Serif Devanagari"`, "मोतियाबिंद"), document.fonts.load(`400 20px "Noto Sans Devanagari"`, "मोतियाबिंद")]);
+  } catch { /* system fonts */ }
   const R = REPORT, pad = 80, w = R.width;
   const canvas = document.createElement("canvas");
   canvas.width = w;
@@ -569,10 +580,11 @@ async function buildReport(results) {
   ctx.textBaseline = "alphabetic";
 
   drawLogo(ctx, pad, 62, 60);
-  ctx.fillStyle = R.ink; ctx.font = `600 30px ${R.sans}`; ctx.fillText("Cataract Screen", pad + 78, 103);
+  ctx.fillStyle = R.ink; ctx.font = `600 30px ${R.sans}`; ctx.fillText(t("app_name"), pad + 78, 103);
   ctx.fillStyle = R.muted; ctx.font = `400 24px ${R.sans}`;
-  ctx.fillText(new Date().toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }), pad, 176);
-  ctx.fillStyle = R.ink; ctx.font = `500 56px ${R.serif}`; ctx.fillText("Eye screening result", pad, 250);
+  const locale = { en: "en-IN", hi: "hi-IN", mr: "mr-IN" }[window.i18n.lang];
+  ctx.fillText(new Date().toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }), pad, 176);
+  ctx.fillStyle = R.ink; ctx.font = `500 56px ${R.serif}`; ctx.fillText(t("rep_title"), pad, 250);
 
   let y = 300;
   for (const r of results) {
@@ -589,14 +601,13 @@ async function buildReport(results) {
       ctx.beginPath(); ctx.arc(px + photoSize / 2, py + photoSize / 2, photoSize / 2 + 14, 0, 2 * Math.PI); ctx.stroke();
     }
     const tx = pad + photoSize + 60, tw = w - tx - pad;
-    ctx.fillStyle = R.muted; ctx.font = `600 22px ${R.sans}`; ctx.fillText(r.name.toUpperCase(), tx, py + 30);
+    ctx.fillStyle = R.muted; ctx.font = `600 22px ${R.sans}`; ctx.fillText(whoText(r.who).toUpperCase(), tx, py + 30);
     if (r.error) {
-      ctx.fillStyle = R.muted; ctx.font = `500 64px ${R.serif}`; ctx.fillText("No result", tx, py + 110);
-      ctx.fillStyle = R.ink; ctx.font = `400 24px ${R.sans}`; wrapText(ctx, r.error, tx, py + 160, tw, 34);
+      ctx.fillStyle = R.muted; ctx.font = `500 64px ${R.serif}`; ctx.fillText(t("res_none"), tx, py + 110);
+      ctx.fillStyle = R.ink; ctx.font = `400 24px ${R.sans}`; wrapText(ctx, r.error(), tx, py + 160, tw, 34);
     } else {
-      const [word, text] = OUTPUT_TEXT[r.output];
-      ctx.fillStyle = R.colors[r.output]; ctx.font = `500 84px ${R.serif}`;
-      ctx.fillText(word[0] + word.slice(1).toLowerCase(), tx, py + 120);
+      ctx.fillStyle = R.colors[r.output]; ctx.font = `500 ${window.i18n.lang === "en" ? 84 : 66}px ${R.serif}`;
+      ctx.fillText(t(`out_${r.output}`), tx, py + 120);
       // score line: green up to the cut-off, amber above, marker at the score
       const ly = py + 170, cut = state.config.screen_threshold;
       ctx.fillStyle = R.colors.normal; ctx.fillRect(tx, ly, tw * cut, 10);
@@ -605,21 +616,21 @@ async function buildReport(results) {
       ctx.fillStyle = R.bg; ctx.strokeStyle = R.ink; ctx.lineWidth = 5;
       ctx.beginPath(); ctx.arc(mx, ly + 5, 13, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
       ctx.fillStyle = R.muted; ctx.font = `400 20px ${R.sans}`;
-      ctx.fillText("clear", tx, ly + 50);
-      const cutLabel = `cut-off ${cut.toFixed(2)}`;
+      ctx.fillText(t("meter_clear"), tx, ly + 50);
+      const cutLabel = t("meter_cut", { c: cut.toFixed(2) });
       ctx.fillText(cutLabel, tx + tw * cut - ctx.measureText(cutLabel).width / 2, ly + 50);
-      ctx.fillText("cloudy", tx + tw - ctx.measureText("cloudy").width, ly + 50);
+      ctx.fillText(t("meter_cloudy"), tx + tw - ctx.measureText(t("meter_cloudy")).width, ly + 50);
       ctx.fillStyle = R.ink; ctx.font = `400 24px ${R.sans}`;
-      let ty = wrapText(ctx, text, tx, ly + 100, tw, 34);
+      let ty = wrapText(ctx, t(`out_${r.output}_text`), tx, ly + 100, tw, 34);
       ctx.fillStyle = R.muted; ctx.font = `400 20px ${R.sans}`;
-      wrapText(ctx, `Score ${r.cataract.toFixed(2)}${r.output !== "normal" ? ` · severity ${r.mature.toFixed(2)}` : ""} · ${r.photo ? "single photo" : `${V.BURST_FRAMES} frames, glare removed`}`, tx, ty + 6, tw, 28);
+      wrapText(ctx, resultNotes(r), tx, ty + 6, tw, 28);
     }
     y += 440;
   }
   ctx.fillStyle = R.line; ctx.fillRect(pad, y, w - 2 * pad, 2);
-  ctx.fillStyle = R.ink; ctx.font = `600 22px ${R.sans}`; ctx.fillText("Student prototype, not a diagnosis.", pad, y + 60);
+  ctx.fillStyle = R.ink; ctx.font = `600 22px ${R.sans}`; ctx.fillText(t("rep_footer_bold"), pad, y + 60);
   ctx.fillStyle = R.muted; ctx.font = `400 22px ${R.sans}`;
-  y = wrapText(ctx, "This result comes from an unvalidated screening model and can be wrong either way. Please show it to an eye doctor (ophthalmologist) for a proper eye examination.", pad, y + 96, w - 2 * pad, 32);
+  y = wrapText(ctx, t("rep_footer"), pad, y + 96, w - 2 * pad, 32);
   ctx.fillText(location.origin + location.pathname, pad, y + 20);
 
   const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
@@ -632,7 +643,7 @@ async function shareReport() {
   if (!file) return;
   if (navigator.canShare?.({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], title: "Cataract Screen result" });
+      await navigator.share({ files: [file], title: t("rep_share_title") });
       return;
     } catch (e) {
       if (e.name === "AbortError") return;   // user closed the share sheet
@@ -653,6 +664,16 @@ function showModeSteps() {
   $("steps-closeup").hidden = mode !== "closeup";
   $("steps-face").hidden = mode !== "face";
 }
+
+window.i18n.onChange(() => {
+  if (state.loadState === "ready") { $("start").textContent = t("start"); setStatus("load-status", t("ready")); }
+  if (state.loadState === "failed") {
+    $("start").textContent = t("models_failed");
+    setStatus("load-status", t("models_failed_msg", { msg: state.loadError }), true);
+  }
+  if (!$("camera").hidden) applyModeToCameraScreen();
+  if (!$("results").hidden && state.lastResults) renderResults(state.lastResults);
+});
 
 $("start").addEventListener("click", startCamera);
 $("capture").addEventListener("click", startBurst);
@@ -707,8 +728,8 @@ window.cataractApp = {
     const img = await this.loadImage(url);
     const results = await analysePhotoSource(img, img.naturalWidth, img.naturalHeight);
     renderResults(results);
-    return results.map((r) => (r.error ? { name: r.name, error: r.error }
-      : { name: r.name, output: r.output, cataract: r.cataract, mature: r.mature, quality: r.quality, faceCheck: r.faceCheck }));
+    return results.map((r) => (r.error ? { who: r.who, error: r.error() }
+      : { who: r.who, output: r.output, cataract: r.cataract, mature: r.mature, quality: r.quality, faceCheck: r.faceCheck }));
   },
   // One-eye close-up photo with the iris at (cx, cy), radius r px: framed exactly as close-up mode frames the ring.
   async analyseCloseupUrl(url, cx, cy, r) {
@@ -718,7 +739,7 @@ window.cataractApp = {
     const box = { x1: Math.round(cx - half), y1: Math.round(cy - half), x2: Math.round(cx + half), y2: Math.round(cy + half) };
     const eye = closeupCrop(img, box);
     const frames = Array(V.BURST_FRAMES).fill(eye);
-    const res = await analyse("Left eye", frames, frames.map(() => r), frames.map(() => half), { photo: true, quality: V.qualityCheck(eye) });
+    const res = await analyse("L", frames, frames.map(() => r), frames.map(() => half), { photo: true, quality: V.qualityCheck(eye) });
     renderResults([res]);
     return { output: res.output, cataract: res.cataract, mature: res.mature, quality: res.quality.reason };
   },
@@ -731,7 +752,7 @@ window.cataractApp = {
       frames.push(grabRegion(img, 0, 0, img.naturalWidth, img.naturalHeight));
     }
     const ones = Array(frames.length).fill(1);
-    const r = await analyse("Left eye", frames, ones.map(() => irisToCropRatio), ones, { burst: true });
+    const r = await analyse("L", frames, ones.map(() => irisToCropRatio), ones, { burst: true });
     renderResults([r]);
     return { output: r.output, cataract: r.cataract, mature: r.mature, opacity: r.res.opacityFraction };
   },
