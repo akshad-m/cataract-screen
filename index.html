@@ -10,8 +10,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Cataract Screen">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icon.svg?v=6" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon-180.png?v=6">
+  <link rel="icon" href="icon.svg?v=7" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-180.png?v=7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -19,9 +19,10 @@
     // apply the saved theme before first paint (no flash)
     try { const t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
+  <script src="theme.js?v=7" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
-  <script type="module" src="app.js?v=6"></script>
+  <script type="module" src="app.js?v=7"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -86,6 +87,7 @@
     <p class="lede">Takes about 30 seconds. Nothing leaves your phone.</p>
     <p class="note">Student prototype, not a diagnosis. It has not been clinically tested and can be wrong
       either way. See an eye doctor about any eye problem.</p>
+    <a class="helplink" href="help.html">What is a cataract? Read the short guide →</a>
 
     <fieldset class="choices">
       <legend>How to scan</legend>
@@ -171,6 +173,7 @@
       <button id="other-eye" class="ghost" hidden>Scan the other eye</button>
       <button id="again" class="primary">Start over</button>
     </div>
+    <p><a class="helplink" href="help.html#after-result">What should I do now? Next steps and free care →</a></p>
     <p class="fineprint">
       <b>Normal</b>: no cataract-like signs found. <b>Refer</b>: cataract-like (immature-like) appearance.
       <b>Urgent</b>: looks like an advanced (mature) cataract. These labels are this prototype's simplification,

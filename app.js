@@ -9,7 +9,7 @@
 //                       (as in the laptop demo).
 
 import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs";
-import * as V from "./vision.js?v=6";   // bump ?v= (here and in index.html) on every release: Pages caches ~10 min
+import * as V from "./vision.js?v=7";   // bump ?v= (here and in index.html) on every release: Pages caches ~10 min
 
 const MEDIAPIPE_WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/wasm";
 const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
@@ -646,19 +646,6 @@ async function shareReport() {
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 
-// ---------- theme ----------
-
-function applyTheme(choice) {
-  if (choice === "light" || choice === "dark") document.documentElement.dataset.theme = choice;
-  else delete document.documentElement.dataset.theme;
-  document.querySelectorAll("[data-theme-choice]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.themeChoice === choice)));
-  try { localStorage.setItem("theme", choice); } catch { /* private mode: the choice lasts this visit only */ }
-}
-
-function savedTheme() {
-  try { return localStorage.getItem("theme") || "auto"; } catch { return "auto"; }
-}
-
 // ---------- wiring ----------
 
 function showModeSteps() {
@@ -684,7 +671,6 @@ document.querySelectorAll(".ill use").forEach((u) => {
   const symbol = document.querySelector(u.getAttribute("href"));
   if (symbol) u.closest("svg").replaceChildren(...[...symbol.childNodes].map((n) => n.cloneNode(true)));
 });
-document.querySelectorAll("[data-theme-choice]").forEach((b) => b.addEventListener("click", () => applyTheme(b.dataset.themeChoice)));
 $("auto-capture").checked = settings.auto;
 $("cues").checked = settings.cues;
 $("auto-capture").addEventListener("change", (e) => { settings.auto = e.target.checked; saveSetting("autoCapture", settings.auto); state.steadySince = null; });
@@ -693,7 +679,6 @@ $("cues").addEventListener("change", (e) => {
   saveSetting("cues", settings.cues);
   if (settings.cues) { unlockAudio(); cue("aligned"); }   // play a sample so the user hears it is on
 });
-applyTheme(savedTheme());
 $("photo-input").addEventListener("change", (e) => {
   const file = e.target.files?.[0];
   e.target.value = "";
