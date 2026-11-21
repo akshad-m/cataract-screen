@@ -9,7 +9,7 @@
 //                       (as in the laptop demo).
 
 import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs";
-import * as V from "./vision.js?v=3";   // bump ?v= (here and in index.html) on every release: Pages caches ~10 min
+import * as V from "./vision.js?v=4";   // bump ?v= (here and in index.html) on every release: Pages caches ~10 min
 
 const MEDIAPIPE_WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/wasm";
 const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
@@ -23,12 +23,63 @@ const OUTPUT_TEXT = {
   urgent: ["URGENT", "Looks like an advanced (mature) cataract to the prototype. A real screening app would advise an early eye check-up."],
 };
 const COLORS = { pass: "#2fbf55", fail: "#ff4d4d", busy: "#4c9cff" };
+const AUTO_HOLD_MS = 1200;              // auto-capture once the picture has stayed good this long
+const ALIGNED_CUE_GAP_MS = 1500;        // don't repeat the "lined up" beep more often than this
 
 const $ = (id) => document.getElementById(id);
 const state = {
   config: null, session: null, landmarker: null, runningMode: "VIDEO", mode: "closeup",
   stream: null, running: false, collectors: null, burstStarted: 0, processing: false, lastVideoTime: -1,
+  steadySince: null, lastAlignedCue: 0,
 };
+
+// ---------- settings (remembered on this device) ----------
+
+function loadSetting(key, fallback) {
+  try { const v = localStorage.getItem(key); return v === null ? fallback : v === "1"; } catch { return fallback; }
+}
+function saveSetting(key, value) {
+  try { localStorage.setItem(key, value ? "1" : "0"); } catch { /* private mode: lasts this visit only */ }
+}
+const settings = { auto: loadSetting("autoCapture", true), cues: loadSetting("cues", true) };
+
+// ---------- sound and vibration cues ----------
+// Tones are generated with Web Audio (no sound files). Browsers only allow sound after a tap, so the
+// audio context is unlocked from the Start-camera tap. Vibration works on Android; iPhones ignore it.
+
+let audio = null;
+function unlockAudio() {
+  try {
+    audio ??= new (window.AudioContext || window.webkitAudioContext)();
+    audio.resume();
+  } catch { audio = null; }
+}
+
+function tone(freq, start, duration) {
+  const osc = audio.createOscillator(), gain = audio.createGain();
+  const t = audio.currentTime + start;
+  osc.type = "sine";
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.0001, t);
+  gain.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+  osc.connect(gain).connect(audio.destination);
+  osc.start(t);
+  osc.stop(t + duration + 0.02);
+}
+
+const CUES = {
+  aligned: { tones: [[660, 0, 0.12]], vibrate: 40 },                        // picture is good
+  start: { tones: [[660, 0, 0.1], [880, 0.12, 0.14]], vibrate: 60 },        // capture begins
+  done: { tones: [[880, 0, 0.12], [1175, 0.15, 0.2]], vibrate: [80, 60, 80] },
+  fail: { tones: [[330, 0, 0.3]], vibrate: 250 },
+};
+function cue(name) {
+  if (!settings.cues) return;
+  const c = CUES[name];
+  try { if (audio) c.tones.forEach(([f, start, d]) => tone(f, start, d)); } catch { /* no audio */ }
+  try { navigator.vibrate?.(c.vibrate); } catch { /* no vibration */ }
+}
 const grab = document.createElement("canvas");
 const grabCtx = grab.getContext("2d", { willReadFrequently: true });
 
@@ -136,6 +187,7 @@ function applyModeToCameraScreen() {
 }
 
 async function startCamera() {
+  unlockAudio();   // must happen inside the tap, before any await
   state.mode = selected("mode");
   const facing = selected("facing");
   if (!navigator.mediaDevices?.getUserMedia) {
@@ -162,6 +214,7 @@ async function startCamera() {
     ? { E: new V.EyeBurstCollector() }
     : { L: new V.EyeBurstCollector(), R: new V.EyeBurstCollector() };
   state.lastVideoTime = -1;
+  state.steadySince = null;
   applyModeToCameraScreen();
   setStatus("camera-status", "");
   $("progress").hidden = true;
@@ -191,6 +244,10 @@ function loop() {
       onFaceFrame(video, state.landmarker.detectForVideo(video, performance.now()).faceLandmarks?.[0]);
     }
     afterFrame();
+  } else if (capturing() && performance.now() - state.burstStarted > BURST_WALL_TIMEOUT_MS) {
+    // no new frames (camera stalled): end the burst anyway so the app never hangs
+    Object.values(state.collectors).forEach((c) => { c.active = false; });
+    afterFrame();
   }
   requestAnimationFrame(loop);
 }
@@ -210,6 +267,24 @@ function setEyeState(label, text, passed) {
   el.className = passed ? "pass" : "fail";
 }
 
+/**
+ * Called every frame with whether the picture is good enough to capture. Returns the auto-capture
+ * countdown (0..1, or 0 when auto-capture is off) and starts the burst when it reaches 1.
+ */
+function updateSteady(good) {
+  const busy = state.processing || Object.values(state.collectors).some((c) => c.active || c.pending);
+  if (!good || busy) { state.steadySince = null; return 0; }
+  const now = performance.now();
+  if (state.steadySince === null) {
+    state.steadySince = now;
+    if (now - state.lastAlignedCue > ALIGNED_CUE_GAP_MS) { cue("aligned"); state.lastAlignedCue = now; }
+  }
+  if (!settings.auto) return 0;
+  const progress = Math.min((now - state.steadySince) / AUTO_HOLD_MS, 1);
+  if (progress >= 1) startBurst();
+  return progress;
+}
+
 function onCloseupFrame(video) {
   const vw = video.videoWidth, vh = video.videoHeight;
   const ctx = overlayContext(vw, vh);
@@ -217,15 +292,25 @@ function onCloseupFrame(video) {
   const crop = closeupCrop(video, box);
   const q = V.qualityCheck(crop);
   state.collectors.E.offer(crop, box.irisRadius, box.cropRadius, q.passed);
+  const hold = updateSteady(q.passed);
   const color = capturing() ? COLORS.busy : q.passed ? COLORS.pass : COLORS.fail;
   ctx.strokeStyle = color;
   ctx.beginPath();
   ctx.arc(box.cx, box.cy, box.ringRadius, 0, 2 * Math.PI);
   ctx.stroke();
+  if (hold > 0) {                                   // auto-capture countdown around the ring
+    ctx.strokeStyle = COLORS.busy;
+    ctx.lineWidth *= 2;
+    ctx.beginPath();
+    ctx.arc(box.cx, box.cy, box.ringRadius + ctx.lineWidth * 1.5, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * hold);
+    ctx.stroke();
+    ctx.lineWidth /= 2;
+    ctx.strokeStyle = color;
+  }
   ctx.setLineDash([12, 10]);
   ctx.strokeRect(box.x1, box.y1, box.x2 - box.x1, box.y2 - box.y1);
   ctx.setLineDash([]);
-  setEyeState("L", q.passed ? "sharp, well lit: iris in the ring?" : q.reason.toLowerCase(), q.passed);
+  setEyeState("L", hold > 0 ? "hold still…" : q.passed ? "sharp, well lit: iris in the ring?" : q.reason.toLowerCase(), q.passed);
   $("capture").disabled = capturing() || !q.passed;
 }
 
@@ -247,6 +332,8 @@ function onFaceFrame(video, face) {
     ctx.strokeRect(box.x1, box.y1, box.x2 - box.x1, box.y2 - box.y1);
     setEyeState(label, q.passed ? "sharp, well lit" : q.reason.toLowerCase(), q.passed);
   }
+  const hold = updateSteady(anyPassed);
+  if (!busy) setStatus("camera-status", hold > 0 ? "Hold still…" : "");
   $("capture").disabled = busy || !anyPassed;
 }
 
@@ -264,6 +351,8 @@ function afterFrame() {
 }
 
 function startBurst() {
+  state.steadySince = null;
+  cue("start");
   Object.values(state.collectors).forEach((c) => c.start());
   state.burstStarted = performance.now();
   $("progress").hidden = false;
@@ -296,6 +385,7 @@ async function finishBurst() {
   }
   stopCamera();
   state.processing = false;
+  cue(results.some((r) => r.error) ? "fail" : "done");
   renderResults(results);
 }
 
@@ -424,7 +514,131 @@ function renderResults(results) {
         el("details", {}, el("summary", {}, "Show processing steps"), panels))));
   }
   $("other-eye").hidden = !(state.mode === "closeup" && results.some((r) => r.burst));
+  state.reportFile = null;
+  $("share").disabled = true;
+  buildReport(results).then((file) => { state.reportFile = file; $("share").disabled = false; })
+    .catch(() => { $("share").hidden = true; });
   show("results");
+}
+
+// ---------- save / share the result ----------
+// A summary image is drawn as soon as results appear, because iPhones only open the share sheet
+// directly from a tap (no time for drawing in between). Always light colours, so it prints well.
+
+const REPORT = {
+  width: 1080, bg: "#f6f4ef", ink: "#13231f", muted: "#5d6b66", line: "#dcd8cf", accent: "#0e6b5c", soft: "#e1ece7",
+  colors: { normal: "#1d7a4a", refer: "#a3620a", urgent: "#b3321f" },
+  serif: "Newsreader, Georgia, serif", sans: "'IBM Plex Sans', system-ui, sans-serif",
+};
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  let line = "";
+  for (const word of text.split(" ")) {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > maxWidth && line) { ctx.fillText(line, x, y); y += lineHeight; line = word; } else line = test;
+  }
+  if (line) { ctx.fillText(line, x, y); y += lineHeight; }
+  return y;
+}
+
+function drawEyeLogo(ctx, x, y, size, color) {
+  const s = size / 48;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(s, s);
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 3; ctx.lineJoin = "round";
+  ctx.stroke(new Path2D("M4 24c5-9 12-14 20-14s15 5 20 14c-5 9-12 14-20 14S9 33 4 24z"));
+  ctx.beginPath(); ctx.arc(24, 24, 7, 0, 2 * Math.PI); ctx.stroke();
+  ctx.beginPath(); ctx.arc(24, 24, 2.5, 0, 2 * Math.PI); ctx.fill();
+  ctx.restore();
+}
+
+async function buildReport(results) {
+  try { await Promise.all([document.fonts.load(`500 40px Newsreader`), document.fonts.load(`400 20px "IBM Plex Sans"`)]); } catch { /* system fonts */ }
+  const R = REPORT, pad = 80, w = R.width;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = 300 + results.length * 440 + 260;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = R.bg; ctx.fillRect(0, 0, w, canvas.height);
+  ctx.textBaseline = "alphabetic";
+
+  drawEyeLogo(ctx, pad, 70, 52, R.accent);
+  ctx.fillStyle = R.ink; ctx.font = `600 30px ${R.sans}`; ctx.fillText("Cataract Screen", pad + 66, 106);
+  ctx.fillStyle = R.muted; ctx.font = `400 24px ${R.sans}`;
+  ctx.fillText(new Date().toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }), pad, 176);
+  ctx.fillStyle = R.ink; ctx.font = `500 56px ${R.serif}`; ctx.fillText("Eye screening result", pad, 250);
+
+  let y = 300;
+  for (const r of results) {
+    ctx.fillStyle = R.line; ctx.fillRect(pad, y, w - 2 * pad, 2);
+    const photoSize = 300, px = pad, py = y + 50;
+    if (r.res) {
+      const img = document.createElement("canvas");
+      drawRGB(img, r.res.medianColor);
+      ctx.save();
+      ctx.beginPath(); ctx.arc(px + photoSize / 2, py + photoSize / 2, photoSize / 2, 0, 2 * Math.PI); ctx.clip();
+      ctx.drawImage(img, px, py, photoSize, photoSize);
+      ctx.restore();
+      ctx.strokeStyle = R.soft; ctx.lineWidth = 8;
+      ctx.beginPath(); ctx.arc(px + photoSize / 2, py + photoSize / 2, photoSize / 2 + 14, 0, 2 * Math.PI); ctx.stroke();
+    }
+    const tx = pad + photoSize + 60, tw = w - tx - pad;
+    ctx.fillStyle = R.muted; ctx.font = `600 22px ${R.sans}`; ctx.fillText(r.name.toUpperCase(), tx, py + 30);
+    if (r.error) {
+      ctx.fillStyle = R.muted; ctx.font = `500 64px ${R.serif}`; ctx.fillText("No result", tx, py + 110);
+      ctx.fillStyle = R.ink; ctx.font = `400 24px ${R.sans}`; wrapText(ctx, r.error, tx, py + 160, tw, 34);
+    } else {
+      const [word, text] = OUTPUT_TEXT[r.output];
+      ctx.fillStyle = R.colors[r.output]; ctx.font = `500 84px ${R.serif}`;
+      ctx.fillText(word[0] + word.slice(1).toLowerCase(), tx, py + 120);
+      // score line: green up to the cut-off, amber above, marker at the score
+      const ly = py + 170, cut = state.config.screen_threshold;
+      ctx.fillStyle = R.colors.normal; ctx.fillRect(tx, ly, tw * cut, 10);
+      ctx.fillStyle = R.colors.refer; ctx.fillRect(tx + tw * cut, ly, tw * (1 - cut), 10);
+      const mx = tx + tw * Math.min(Math.max(r.cataract, 0), 1);
+      ctx.fillStyle = R.bg; ctx.strokeStyle = R.ink; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.arc(mx, ly + 5, 13, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = R.muted; ctx.font = `400 20px ${R.sans}`;
+      ctx.fillText("clear", tx, ly + 50);
+      const cutLabel = `cut-off ${cut.toFixed(2)}`;
+      ctx.fillText(cutLabel, tx + tw * cut - ctx.measureText(cutLabel).width / 2, ly + 50);
+      ctx.fillText("cloudy", tx + tw - ctx.measureText("cloudy").width, ly + 50);
+      ctx.fillStyle = R.ink; ctx.font = `400 24px ${R.sans}`;
+      let ty = wrapText(ctx, text, tx, ly + 100, tw, 34);
+      ctx.fillStyle = R.muted; ctx.font = `400 20px ${R.sans}`;
+      wrapText(ctx, `Score ${r.cataract.toFixed(2)}${r.output !== "normal" ? ` · severity ${r.mature.toFixed(2)}` : ""} · ${r.photo ? "single photo" : `${V.BURST_FRAMES} frames, glare removed`}`, tx, ty + 6, tw, 28);
+    }
+    y += 440;
+  }
+  ctx.fillStyle = R.line; ctx.fillRect(pad, y, w - 2 * pad, 2);
+  ctx.fillStyle = R.ink; ctx.font = `600 22px ${R.sans}`; ctx.fillText("Student prototype, not a diagnosis.", pad, y + 60);
+  ctx.fillStyle = R.muted; ctx.font = `400 22px ${R.sans}`;
+  y = wrapText(ctx, "This result comes from an unvalidated screening model and can be wrong either way. Please show it to an eye doctor (ophthalmologist) for a proper eye examination.", pad, y + 96, w - 2 * pad, 32);
+  ctx.fillText(location.origin + location.pathname, pad, y + 20);
+
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+  const stamp = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "");
+  return new File([blob], `cataract-screen-${stamp}.png`, { type: "image/png" });
+}
+
+async function shareReport() {
+  const file = state.reportFile;
+  if (!file) return;
+  if (navigator.canShare?.({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: "Cataract Screen result" });
+      return;
+    } catch (e) {
+      if (e.name === "AbortError") return;   // user closed the share sheet
+    }
+  }
+  const url = URL.createObjectURL(file);
+  const a = el("a", { href: url, download: file.name });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 
 // ---------- theme ----------
@@ -452,6 +666,7 @@ $("start").addEventListener("click", startCamera);
 $("capture").addEventListener("click", startBurst);
 $("back").addEventListener("click", () => { stopCamera(); show("intro"); });
 $("again").addEventListener("click", () => show("intro"));
+$("share").addEventListener("click", shareReport);
 $("other-eye").addEventListener("click", () => {
   const other = selected("which-eye") === "L" ? "R" : "L";
   document.querySelector(`input[name=which-eye][value=${other}]`).checked = true;
@@ -459,6 +674,14 @@ $("other-eye").addEventListener("click", () => {
 });
 document.querySelectorAll("input[name=mode]").forEach((r) => r.addEventListener("change", showModeSteps));
 document.querySelectorAll("[data-theme-choice]").forEach((b) => b.addEventListener("click", () => applyTheme(b.dataset.themeChoice)));
+$("auto-capture").checked = settings.auto;
+$("cues").checked = settings.cues;
+$("auto-capture").addEventListener("change", (e) => { settings.auto = e.target.checked; saveSetting("autoCapture", settings.auto); state.steadySince = null; });
+$("cues").addEventListener("change", (e) => {
+  settings.cues = e.target.checked;
+  saveSetting("cues", settings.cues);
+  if (settings.cues) { unlockAudio(); cue("aligned"); }   // play a sample so the user hears it is on
+});
 applyTheme(savedTheme());
 $("photo-input").addEventListener("change", (e) => {
   const file = e.target.files?.[0];
@@ -475,6 +698,7 @@ const ready = loadModels();
 // Test hooks: let automated browser checks run the pipeline without a camera or file picker.
 window.cataractApp = {
   ready,
+  lastReport: () => state.reportFile,
   async loadImage(url) {
     const img = new Image();
     img.src = url;
