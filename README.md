@@ -13,8 +13,12 @@ NORMAL / REFER / URGENT.
 
 ## Privacy
 Everything runs on the phone: the camera images are processed in the browser and are never uploaded
-or stored. The page loads its libraries from public CDNs (MediaPipe, ONNX Runtime Web) and the face
-landmark model from Google's storage.
+or stored. All libraries, models and fonts are served from this site (see `vendor/README.md`); the page
+contacts no other servers.
+
+## Works offline
+At the first visit the phone saves the whole app (about 30 MB; `sw.js`). After that it opens and
+runs without internet, in English, Hindi and Marathi.
 
 ## What is here
 | File | Purpose |
@@ -22,6 +26,9 @@ landmark model from Google's storage.
 | `index.html`, `app.js`, `style.css` | The app: camera, close-up ring or whole-face capture, results |
 | `vision.js` | Quality gate, burst collection, glare separation, model input (port of the Python prototype) |
 | `model/cataract.onnx`, `model/config.json` | MobileNetV3 backbone + screening and severity models, and their cut-offs |
+| `help.html` | About cataract: symptoms, what to do after a result, treatment, free care in India |
+| `vendor/` | Bundled MediaPipe, ONNX Runtime Web and fonts (versions and licences in `vendor/README.md`) |
+| `sw.js`, `build_sw.py` | Offline support: the service worker and the script that generates it |
 | `build_web_model.py`, `test/` | How the model was converted and how the JavaScript was checked against the Python code (they need the full private project to run) |
 
 Built with MediaPipe Face Landmarker and ONNX Runtime Web.

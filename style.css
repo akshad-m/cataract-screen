@@ -275,3 +275,5 @@ ul.sources li { margin: 6px 0; }
 :lang(hi) dl.myths dt::before, :lang(mr) dl.myths dt::before, :lang(hi) dl.myths dd::before, :lang(mr) dl.myths dd::before {
   letter-spacing: 0; text-transform: none;
 }
+
+.offline-note { font-size: 13px; color: var(--ok); margin: 10px 0 0; }
